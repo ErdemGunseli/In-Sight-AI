@@ -68,3 +68,4 @@ def get_user(db: db_dependency, user_id: int) -> User:
     user = db.query(User).filter_by(id=user_id).first()
     if user is None: raise UserNotFoundException
     return user
+

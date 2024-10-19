@@ -1,7 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi.middleware import SlowAPIMiddleware
+from slowapi.errors import RateLimitExceeded
+from slowapi import _rate_limit_exceeded_handler
 from dotenv import load_dotenv
 import uvicorn
+
 
 # Loading environment variables and declaring FastAPI instance before local imports:
 load_dotenv()
@@ -20,6 +24,8 @@ import models
 
 from rate_limiter import limiter
 app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
 
 # Creating tables if they don't already exist:
 models.Base.metadata.create_all(bind=engine)
