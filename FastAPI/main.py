@@ -11,14 +11,12 @@ import uvicorn
 load_dotenv()
 app = FastAPI()
 
-import sys
 import os
+import sys
+import json
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-print("Current working directory:", os.getcwd())
-print("Files and directories:", os.listdir())
 
 from routers import assistant, auth, users
-from config import read_config
 from database import engine
 import models
 
@@ -38,9 +36,8 @@ app.include_router(users.router)
 
 
 # Adding client domains to avoid CORS blocking:
-origins = read_config("cors_origins")
-app.add_middleware(CORSMiddleware, allow_origins=origins, allow_credentials=True, 
-                   allow_methods=['*'], allow_headers=['*'])
+app.add_middleware(CORSMiddleware, allow_origins=json.loads(os.getenv("CORS_ORIGINS")), 
+                   allow_credentials=True, allow_methods=['*'], allow_headers=['*'])
 
 
 # TODO: Incorporate RealTime
