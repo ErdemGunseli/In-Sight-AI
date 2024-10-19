@@ -60,10 +60,11 @@ async def get_current_user(db: db_dependency, token: token_dependency) -> User:
 
     return get_user(db, user_id)
 
+
 user_dependency = Annotated[dict, Depends(get_current_user)]
+
 
 def get_user(db: db_dependency, user_id: int) -> User:
     user = db.query(User).filter_by(id=user_id).first()
     if user is None: raise UserNotFoundException
     return user
-

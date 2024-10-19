@@ -1,6 +1,3 @@
-import re
-import requests
-
 from sqlalchemy.exc import IntegrityError
 
 from exceptions import UserExistsException

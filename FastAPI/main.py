@@ -1,8 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.errors import RateLimitExceeded
-from slowapi.util import get_remote_address
 from dotenv import load_dotenv
 import uvicorn
 
@@ -10,21 +7,14 @@ import uvicorn
 load_dotenv()
 app = FastAPI()
 
-limiter = Limiter(key_func=get_remote_address, default_limits=["3/second", "120/minute"])
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
-
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-print("Current working directory:", os.getcwd())
-print("Files and directories:", os.listdir())
 
 from routers import assistant, auth, users
 from config import read_config
 from database import engine
 import models
 
+from rate_limiter import limiter
+app.state.limiter = limiter
 
 # Creating tables if they don't already exist:
 models.Base.metadata.create_all(bind=engine)
