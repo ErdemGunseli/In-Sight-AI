@@ -14,7 +14,11 @@ limiter = Limiter(key_func=get_remote_address, default_limits=["3/second", "120/
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
+import sys
 import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+print("Current working directory:", os.getcwd())
+print("Files and directories:", os.listdir())
 
 from routers import assistant, auth, users
 from config import read_config
