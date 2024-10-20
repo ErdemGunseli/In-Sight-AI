@@ -11,8 +11,13 @@ def create_user(db: db_dependency, user_data: CreateUserRequest) -> User:
     # Hashing the password:
     password_hash = bcrypt_context.hash(user_data.password)
 
-    # Creating a new user instance with their name formatted, and the hashed password instead of plaintext:
-    new_user = User(**user_data.model_dump(exclude={"password", "name", "postcode"}), name=user_data.name.title(), password=password_hash)
+    # Creating a new user instance with email in lowercase:
+    new_user = User(
+        **user_data.model_dump(exclude={"password", "name", "postcode"}),
+        name=user_data.name.title(),
+        email=user_data.email.lower(),
+        password=password_hash
+    )
 
     try: 
         # Returning the new user (will be converted to the response model at the endpoints):
