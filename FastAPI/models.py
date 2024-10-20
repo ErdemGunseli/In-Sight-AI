@@ -13,7 +13,7 @@ class User(Base):
     email = Column(String, index=True, unique=True, nullable=False)
     password = Column(String, nullable=False)
 
-    messages = relationship("Message", back_populates="user")
+    messages = relationship("Message", back_populates="user", cascade="all, delete-orphan")
 
 
 class Message(Base):

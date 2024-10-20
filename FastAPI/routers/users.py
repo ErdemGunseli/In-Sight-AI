@@ -20,3 +20,8 @@ async def create_user(db: db_dependency, user_data: CreateUserRequest, request: 
 @limiter.limit("")
 async def read_current_user(user: user_dependency, request: Request):
     return user
+
+@router.delete("/", status_code=st.HTTP_204_NO_CONTENT)
+@limiter.limit("")
+async def delete_user(db: db_dependency, user: user_dependency, request: Request):
+    us.delete_user(db, user)

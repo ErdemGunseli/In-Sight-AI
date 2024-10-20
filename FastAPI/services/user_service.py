@@ -1,7 +1,7 @@
 from sqlalchemy.exc import IntegrityError
 
 from exceptions import UserExistsException
-from dependencies import db_dependency
+from dependencies import db_dependency, user_dependency
 from schemas import CreateUserRequest
 from models import User
 from security import bcrypt_context
@@ -24,3 +24,9 @@ def create_user(db: db_dependency, user_data: CreateUserRequest) -> User:
         
     except IntegrityError as e: 
         raise UserExistsException
+
+
+def delete_user(db: db_dependency, user: user_dependency) -> None:
+    db.delete(user)
+    db.commit()
+    
