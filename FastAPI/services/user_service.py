@@ -13,7 +13,7 @@ def create_user(db: db_dependency, user_data: CreateUserRequest) -> User:
 
     # Creating a new user instance with email in lowercase:
     new_user = User(
-        **user_data.model_dump(exclude={"password", "name", "postcode"}),
+        **user_data.model_dump(exclude={"password", "name", "email"}),
         name=user_data.name.title(),
         email=user_data.email.lower(),
         password=password_hash
