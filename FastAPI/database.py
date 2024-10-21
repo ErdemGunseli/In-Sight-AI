@@ -10,7 +10,7 @@ from strings import *
 DB_URI = os.getenv("DB_URI")
 
 # Declaring the engine to connect with the DB:
-engine = create_engine(DB_URI)
+engine = create_engine(DB_URI, pool_pre_ping=True)
 
 # sessionmaker class is used to create session objects to connect & interact with the DB:
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

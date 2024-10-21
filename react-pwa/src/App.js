@@ -22,7 +22,7 @@ function App() {
           width="80vw" 
           height="80vh"
         >
-          <Typography variant="title" sx={{ mb: 2 }}>
+          <Typography variant="title" sx={{ mb: 2, fontSize: '3rem' }}>
             in-sight.ai
           </Typography>
 

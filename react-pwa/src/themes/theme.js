@@ -37,7 +37,7 @@ const theme = createTheme({
           margin: 2,
         },
         title: {
-          fontSize: '2.5rem',
+          fontSize: '2.2rem',
           fontWeight: 'bold',
           background: 'linear-gradient(135deg, #6a5acd 0%, #1976d2 100%)',
           WebkitBackgroundClip: 'text',

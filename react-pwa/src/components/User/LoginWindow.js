@@ -87,7 +87,7 @@ function LoginWindow({ isOpen, onClose }) {
         />
 
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', mt: 1 }}>
-          <Typography variant='normalText' >
+          <Typography >
             {isSignUp ? 'Already with us?' : 'First time here?'}
           </Typography>
 
