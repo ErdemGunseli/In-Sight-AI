@@ -13,7 +13,6 @@ app = FastAPI()
 
 import os
 import sys
-import json
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from routers import assistant, auth, users
@@ -36,8 +35,13 @@ app.include_router(users.router)
 
 
 # Adding client domains to avoid CORS blocking:
-app.add_middleware(CORSMiddleware, allow_origins=json.loads(os.getenv("CORS_ORIGINS")), 
-                   allow_credentials=True, allow_methods=['*'], allow_headers=['*'])
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # TODO: Incorporate RealTime
