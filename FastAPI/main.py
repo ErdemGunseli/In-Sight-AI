@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi.middleware import SlowAPIMiddleware
+from fastapi.responses import PlainTextResponse
 from slowapi.errors import RateLimitExceeded
 from slowapi import _rate_limit_exceeded_handler
 from dotenv import load_dotenv
@@ -32,6 +33,11 @@ models.Base.metadata.create_all(bind=engine)
 app.include_router(assistant.router)
 app.include_router(auth.router)
 app.include_router(users.router)
+
+
+@app.get("/", response_class=PlainTextResponse)
+async def root():
+    return "Welcome to the In-Sight API! You can send requests to this URL. For documentation, please visit https://api.in-sight.ai/docs."
 
 
 # Adding client domains to avoid CORS blocking:
