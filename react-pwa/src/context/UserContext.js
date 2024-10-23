@@ -46,6 +46,8 @@ export const UserProvider = ({ children }) => {
   );
 };
 
+export default UserContext;
+
 
 // Custom hook to simplify usage slightly
 // (Otherwise consumer would need to import useContext and UserContext, now only need useUser)
@@ -53,5 +55,3 @@ export const useUser = () => {
     return useContext(UserContext);
 };
 
-
-export default UserContext;

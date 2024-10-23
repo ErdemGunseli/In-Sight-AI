@@ -10,7 +10,6 @@ function LoginWindow({ isOpen, onClose }) {
 
     const { refreshUser } = useUser();
 
-    // Set sign-up as the default state:
     const [isSignUp, setIsSignUp] = useState(true);
 
     const [name, setName] = useState('');
@@ -23,7 +22,7 @@ function LoginWindow({ isOpen, onClose }) {
         setName('');
         setEmail('');
         setPassword('');
-        setIsSignUp(true); // Reset to sign-up when closed
+        setIsSignUp(true);
       }
     }, [isOpen]);
 

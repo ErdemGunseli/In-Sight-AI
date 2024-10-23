@@ -23,6 +23,7 @@ class Message(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
     type = Column(Enum(MessageType), nullable=False, index=True)
     text = Column(String, nullable=False)
+    encoded_audio = Column(String, nullable=True)
     timestamp = Column(DateTime, server_default=func.now(), index=True)
 
     user = relationship("User", back_populates="messages")
