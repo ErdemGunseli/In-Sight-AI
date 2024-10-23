@@ -35,7 +35,7 @@ app.include_router(auth.router)
 app.include_router(users.router)
 
 
-@app.get("/", response_class=PlainTextResponse)
+@app.get("/", response_class=PlainTextResponse, include_in_schema=False)
 async def root():
     return "Welcome to the In-Sight API! You can send requests to this URL. For documentation, please visit https://api.in-sight.ai/docs."
 
