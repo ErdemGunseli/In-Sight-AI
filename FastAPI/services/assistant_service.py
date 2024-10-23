@@ -58,9 +58,9 @@ def format_messages(messages: List[Message], user: user_dependency) -> List[str]
     return formatted_messages
 
 
-def add_message(db: db_dependency, user: user_dependency, type: MessageType, text: str) -> Message:
+def add_message(db: db_dependency, user: user_dependency, type: MessageType, text: str, encoded_audio: Optional[str] = None) -> Message:
     start_time = time.time()
-    new_message = Message(user_id=user.id, type=type, text=text)
+    new_message = Message(user_id=user.id, type=type, text=text, encoded_audio=encoded_audio)
     db.add(new_message)
     db.commit()
     db.refresh(new_message)
@@ -167,14 +167,14 @@ async def completion(db: db_dependency, user: user_dependency, text: Optional[st
         # Sending the completion request to the API:
         completion_text = send_completion_request(user, messages, encoded_image, model, max_tokens=max_tokens)
 
-        # Adding the assistant response to the db:
-        add_message(db, user, MessageType.ASSISTANT, completion_text)
-
         encoded_audio = None
         if generate_audio:
             # Converting the response text to audio:
             audio_bytes = text_to_speech(completion_text)
             encoded_audio = base64.b64encode(audio_bytes).decode("utf-8")
+        
+        # Adding the assistant response to the db:
+        add_message(db, user, MessageType.ASSISTANT, completion_text, encoded_audio)
 
         time_taken = time.time() - start_time
         print(f"Total time taken for completion (incl image processing, TTS, STT): {time_taken:.4f} seconds")
