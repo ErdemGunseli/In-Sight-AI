@@ -1,5 +1,5 @@
 {
-  "name": "react-pwa",
+  "name": "react-extension",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -44,7 +44,14 @@
     "extends": [
       "react-app",
       "react-app/jest"
-    ]
+    ],
+    "env": {
+      "browser": true,
+      "webextensions": true
+    },
+    "globals": {
+      "chrome": "readonly"
+    }
   },
   "browserslist": {
     "production": [

@@ -15,9 +15,11 @@ router = APIRouter(prefix="/assistant", tags=["Assistant"])
 @router.post("/completion", response_model=MessageResponse, status_code=st.HTTP_201_CREATED)
 @limiter.limit("5/minute, 20/month")
 async def completion(db: db_dependency, user: user_dependency, request: Request,
-                     text: Optional[str] = Form(None), audio: UploadFile = File(None), image: UploadFile = File(None), model: AIModel = Form(AIModel.GPT_4O), generate_audio: bool = Form(False)):
+                     text: Optional[str] = Form(None), audio: UploadFile = File(None), 
+                     image: UploadFile = File(None), encoded_image: Optional[str] = Form(None),
+                     model: AIModel = Form(AIModel.GPT_4O), generate_audio: bool = Form(False)):
     
-    return await assistant_service.completion(db, user, text, audio, image, model, generate_audio, max_tokens=100)
+    return await assistant_service.completion(db, user, text, audio, image, encoded_image, model, generate_audio, max_tokens=100)
 
 
 @router.get("/messages", response_model=List[MessageResponse], status_code=st.HTTP_200_OK)

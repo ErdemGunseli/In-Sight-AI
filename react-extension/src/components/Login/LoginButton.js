@@ -25,7 +25,7 @@ function LoginButton({ sx }) {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', mx: 2}}>
 
-      <Button onClick={handleLoginClick} variant='contained' sx={sx}>
+      <Button onClick={handleLoginClick} variant={user ? 'text' : 'contained'} sx={sx}>
         {user ? 'Log Out' : 'Get Started'}
       </Button>
 

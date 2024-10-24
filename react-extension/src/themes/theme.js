@@ -2,7 +2,6 @@
 import { createTheme } from '@mui/material/styles';
 
 const theme = createTheme({
-
   palette: {
     mode: 'light',
     primary: {
@@ -27,10 +26,8 @@ const theme = createTheme({
       disabled: '#999999'
     },
   },
-  
 
   components: {
-
     MuiTypography: {
       styleOverrides: {
         root: {
@@ -67,11 +64,12 @@ const theme = createTheme({
         },
         text: {
           fontSize: '1rem',
-          color: '#1976d2',
-          backgroundImage: 'none',
-          '&:hover': {
-            backgroundImage: 'none',
-          },
+          color: 'transparent',
+          backgroundImage: 'linear-gradient(135deg, #6a5acd 0%, #1976d2 20%, #1976d2 80%, #6a5acd 100%)',
+          backgroundClip: 'text',
+          WebkitBackgroundClip: 'text',
+          textFillColor: 'transparent',
+          WebkitTextFillColor: 'transparent',
         },
       },
     },
@@ -85,7 +83,6 @@ const theme = createTheme({
       },
     },
 
-
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
@@ -95,7 +92,6 @@ const theme = createTheme({
     },
 
     MuiAppBar: {
-      // Using 'styleOverrides' allows us to access theme-specific values:
       styleOverrides: {
         root: ({ theme }) => ({
           backgroundColor: theme.palette.background.default,
@@ -118,15 +114,38 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           marginRight: 2,
+          '&.MuiIconButton-sound': {
+            borderRadius: '0 10px 10px 0',
+          },
+          '&.MuiIconButton-send': {
+            borderRadius: '50%',
+            backgroundImage: 'linear-gradient(135deg, #6a5acd 0%, #1976d2 20%, #1976d2 80%, #6a5acd 100%)',
+            color: '#ffffff',
+          },
         },
       },
     },
+
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          padding: '15px',
+          borderRadius: '10px',
+        },
+        assistant: {
+          backgroundImage: 'linear-gradient(135deg, #6a5acd 0%, #1976d2 20%, #1976d2 80%, #6a5acd 100%)',
+          color: '#ffffff',
+        },
+        user: {
+          backgroundColor: '#f5f5f5',
+        },
+      },
+    },
+
+
   },
 
   spacing: 8,
 });
 
 export default theme;
-
-
-

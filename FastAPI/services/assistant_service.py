@@ -131,13 +131,14 @@ def send_completion_request(_: user_dependency, messages: dict, encoded_image: s
 
 
 async def completion(db: db_dependency, user: user_dependency, text: Optional[str],
-    audio: Optional[UploadFile], image: Optional[UploadFile], model: AIModel = AIModel.GPT_4O, generate_audio: bool = False, max_tokens: int = 300) -> dict: 
+    audio: Optional[UploadFile], image: Optional[UploadFile], encoded_image: Optional[str] = None,
+    model: AIModel = AIModel.GPT_4O, generate_audio: bool = False, max_tokens: int = 300) -> dict: 
 
     print("\n\n\n")
     start_time = time.time()
     try:
         # If at least one type of input is not provided, raising an exception:
-        if not any([text, audio, image]):
+        if not any([text, audio, image, encoded_image]):
             raise NoMessageException
 
         transcription = None
@@ -148,8 +149,7 @@ async def completion(db: db_dependency, user: user_dependency, text: Optional[st
             await audio.close()
 
 
-        encoded_image = None
-        if image:
+        if image and not encoded_image:
             # Reading and encoding the image file:
             image_content = await image.read()
             encoded_image = base64.b64encode(image_content).decode("utf-8")
