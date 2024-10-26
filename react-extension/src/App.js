@@ -75,3 +75,4 @@ export default App;
 
 // TODO: Make Margins Consistent
 // TODO: More transitions
+// TODO: TOAST ERRORS

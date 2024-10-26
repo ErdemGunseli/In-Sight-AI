@@ -119,8 +119,22 @@ def send_completion_request(_: user_dependency, messages: dict, encoded_image: s
     # Sending the completion request:
     response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
 
+    # Check if the response is successful
+    if response.status_code != 200:
+        print(f"API request failed with status code {response.status_code}")
+        print(f"Response content: {response.text}")
+        raise HTTPException(status_code=response.status_code, detail="API request failed")
+
     # Extracting the response content:
     response_data = response.json()
+
+    # Print the full response data for debugging
+    print(f"Full API response: {response_data}")
+
+    # Check if 'choices' is in the response data
+    if "choices" not in response_data:
+        print("Error: 'choices' key not found in the response data")
+        raise UnprocessableMessageException
 
     # Need to obtain values from dict (rather than attributes) since we are using requests instead of SDK:
     response_message = response_data["choices"][0]["message"]
