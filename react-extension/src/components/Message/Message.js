@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Box, Typography, Paper } from '@mui/material';
 import { VolumeUp as VolumeUpIcon, StopCircle as StopCircleIcon } from '@mui/icons-material';
 
@@ -13,6 +13,17 @@ function Message({ message }) {
     // The 'useRef' hook creates a mutable object, and does not cause a re-render if it changes:
     const audioRef = useRef(message.encoded_audio ? new Audio(`data:audio/wav;base64,${message.encoded_audio}`) : null);
 
+    // Add an effect to handle the audio 'ended' event
+    useEffect(() => {
+        const audio = audioRef.current;
+        if (audio) {
+            const handleAudioEnd = () => setIsPlaying(false);
+            audio.addEventListener('ended', handleAudioEnd);
+            return () => {
+                audio.removeEventListener('ended', handleAudioEnd);
+            };
+        }
+    }, [audioRef]);
 
     const toggleAudio = () => {
         // Toggling audio playback:
@@ -62,21 +73,7 @@ function Message({ message }) {
                         }}
                     >
                         {message.encoded_audio && (
-                            isPlaying ? (
-                                <StopCircleIcon 
-                                    style={{ 
-                                        color: 'white', 
-                                        cursor: 'pointer' 
-                                    }} 
-                                />
-                            ) : (
-                                <VolumeUpIcon 
-                                    style={{ 
-                                        color: 'white', 
-                                        cursor: 'pointer' 
-                                    }} 
-                                />
-                            )
+                            isPlaying ? <StopCircleIcon /> : <VolumeUpIcon />
                         )}
                     </Box>
                 </Box>

@@ -22,7 +22,7 @@ function App() {
       <Box 
         display="flex" 
         flexDirection="column" 
-        justifyContent="center" 
+        justifyContent="space-between" 
         alignItems="center" 
         minWidth="500px" 
         minHeight="600px"
@@ -33,9 +33,17 @@ function App() {
         {user ? (
           // Assistant Screen
           <>
-            <Header />
+            <Box height="60px" width="100%">
+              <Header />
+            </Box>
             <Divider sx={{ width: '100%' }} />
-            <Messages />
+            <Box 
+              flexGrow={1} 
+              width="100%" 
+              overflow="auto"
+            >
+              <Messages />
+            </Box>
             <Box 
               display="flex" 
               flexDirection="column"
@@ -46,6 +54,7 @@ function App() {
               bottom={0} 
               bgcolor="background.paper"
               sx={{ mx: 2 }}
+              height="80px"
             >
               <Divider sx={{ width: '100%', mb: 1 }} />
               <MessageInput />
@@ -65,3 +74,4 @@ export default App;
 
 
 // TODO: Make Margins Consistent
+// TODO: More transitions

@@ -13,6 +13,15 @@
     "service_worker": "background.js"
   },
 
+  "commands": {
+    "open_extension": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y"
+      },
+      "description": "Open the extension"
+    }
+  },
+
   "permissions": ["tabs", "activeTab", "scripting", "storage"],
 
   "icons": {

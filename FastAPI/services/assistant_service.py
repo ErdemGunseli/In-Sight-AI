@@ -22,6 +22,7 @@ import json
 
 client = OpenAI()
 
+
 def get_messages(db: db_dependency, user: user_dependency, limit: int = 20) -> List[Message]:
     start_time = time.time()
     user_messages = get_user_messages(db, user, limit)

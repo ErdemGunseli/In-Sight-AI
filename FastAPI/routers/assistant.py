@@ -19,7 +19,23 @@ async def completion(db: db_dependency, user: user_dependency, request: Request,
                      image: UploadFile = File(None), encoded_image: Optional[str] = Form(None),
                      model: AIModel = Form(AIModel.GPT_4O), generate_audio: bool = Form(False)):
     
-    return await assistant_service.completion(db, user, text, audio, image, encoded_image, model, generate_audio, max_tokens=100)
+    # Print incoming data
+    print("\t\t\tIncoming request data:")
+    print(f"Text: {text}")
+    print(f"Audio: {audio.filename if audio else 'None'}")
+    print(f"Image: {image.filename if image else 'None'}")
+    print(f"Encoded Image: {encoded_image}")
+    print(f"Model: {model}")
+    print(f"Generate Audio: {generate_audio}")
+
+    # Call the service
+    response = await assistant_service.completion(db, user, text, audio, image, encoded_image, model, generate_audio, max_tokens=100)
+
+    # Print outgoing data
+    print("\t\t\tResponse data:")
+    print(response)
+
+    return response
 
 
 @router.get("/messages", response_model=List[MessageResponse], status_code=st.HTTP_200_OK)
@@ -32,5 +48,6 @@ async def read_messages(db: db_dependency, user: user_dependency, request: Reque
 @limiter.limit("10/minute")
 async def delete_messages(db: db_dependency, user: user_dependency, request: Request):
     assistant_service.delete_messages(db, user)
+
 
 
