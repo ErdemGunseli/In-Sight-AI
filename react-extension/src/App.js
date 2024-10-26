@@ -39,26 +39,30 @@ function App() {
             </Box>
             <Divider sx={{ width: '100%' }} />
             <Box 
+              display="flex"
+              flexDirection="column"
               flexGrow={1} 
               width="100%" 
-              overflow="auto" // Only this Box should have overflow
+              overflow="hidden" // Prevent overflow from the container itself
             >
-              <Messages />
-            </Box>
-            <Box 
-              display="flex" 
-              flexDirection="column"
-              alignItems="center" 
-              justifyContent="center" 
-              width="100%" 
-              position="sticky" 
-              bottom={0} 
-              bgcolor="background.paper"
-              sx={{ mx: 2 }}
-              height="80px"
-            >
-              <Divider sx={{ width: '100%', mb: 1 }} />
-              <MessageInput />
+              <Box 
+                flexGrow={1} 
+                overflow="auto" // Allow scrolling within the Messages area
+              >
+                <Messages />
+              </Box>
+              <Box 
+                display="flex" 
+                flexDirection="column"
+                alignItems="center" 
+                justifyContent="center" 
+                width="100%" 
+                position="sticky" 
+                bottom={0} 
+              >
+                <Divider sx={{ width: '100%' }} />
+                <MessageInput />
+              </Box>
             </Box>
           </>
         ) : (
@@ -77,3 +81,4 @@ export default App;
 // TODO: Make Margins Consistent
 // TODO: More transitions
 // TODO: TOAST ERRORS
+

@@ -1,49 +1,16 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import { Box, Typography, Paper } from '@mui/material';
 import { VolumeUp as VolumeUpIcon, StopCircle as StopCircleIcon, Image as ImageIcon } from '@mui/icons-material';
+import useAudioPlayer from '../../hooks/useAudioPlayer';
 
 function Message({ message }) {
-    // Whether the message is created by the user or the assistant:
     const isUser = message.type === 'user';
-
-    // State for audio playback:
-    const [isPlaying, setIsPlaying] = useState(false);
-
-    // If encoded audio provided, creating a new HTMLAudioElement instance:
-    // The 'useRef' hook creates a mutable object, and does not cause a re-render if it changes:
-    const audioRef = useRef(message.encoded_audio ? new Audio(`data:audio/wav;base64,${message.encoded_audio}`) : null);
-
-    // Add an effect to handle the audio 'ended' event
-    useEffect(() => {
-        const audio = audioRef.current;
-        if (audio) {
-            const handleAudioEnd = () => setIsPlaying(false);
-            audio.addEventListener('ended', handleAudioEnd);
-            return () => {
-                audio.removeEventListener('ended', handleAudioEnd);
-            };
-        }
-    }, [audioRef]);
-
-    const toggleAudio = () => {
-        // Toggling audio playback:
-        if (audioRef.current) {
-            if (isPlaying) {
-                audioRef.current.pause();
-                audioRef.current.currentTime = 0;
-            } else {
-                audioRef.current.play();
-            }
-            setIsPlaying(!isPlaying);
-        }
-    };
+    const { isPlaying, toggleAudio } = useAudioPlayer(message.encoded_audio);
 
     return (
         <Box 
             display="flex" 
-            // User messages are aligned to the end (right); assistant messages are aligned to the start:
             justifyContent={isUser ? 'flex-end' : 'flex-start'}
-            // If encoded audio is provided, showing a pointer since clicking toggles playback:
             cursor={message.encoded_audio ? 'pointer' : 'default'}
             maxWidth="100%"
             width="100%"

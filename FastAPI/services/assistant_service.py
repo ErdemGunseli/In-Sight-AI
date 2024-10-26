@@ -95,14 +95,14 @@ def speech_to_text(audio_bytes: bytes, file_name: str) -> str:
 
 def text_to_speech(text: str) -> bytes: 
     start_time = time.time()
-    result = client.audio.speech.create(model="tts-1", voice="alloy", input=text).content
+    result = client.audio.speech.create(model="tts-1-hd", voice="alloy", input=text).content
     time_taken = time.time() - start_time
 
     print(f"Time taken for text to speech: {time_taken:.4f} seconds")
     return result
 
 
-def send_completion_request(_: user_dependency, messages: dict, encoded_image: str = None, model: AIModel = AIModel.GPT_4O, max_tokens: int = 100) -> str:
+def send_completion_request(_: user_dependency, messages: dict, encoded_image: str = None, model: AIModel = AIModel.GPT_4O, max_tokens: int = 300) -> str:
     # Ensuring the messages are in the correct format for the API:
     formatted_messages = messages
 

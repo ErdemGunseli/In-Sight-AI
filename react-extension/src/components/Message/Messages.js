@@ -10,7 +10,6 @@ function Messages() {
 
     const messagesEndRef = useRef(null);
 
-
     useEffect(() => {
         if (user) {
             refreshMessages();
@@ -29,18 +28,19 @@ function Messages() {
         <Box 
             sx={{ 
                 // 'overflowY makes the box scrollable when necessary:
-                overflowY: 'auto', 
                 padding: '10px', 
                 height: '100%',
             }}
         >
             {/* 'listStyleType' being 'none' removes bullet points from the list. */}
             <ul style={{ padding: 0, margin: 0, listStyleType: 'none' }}>
-                {messages.map((message, index) => (
-                    <li key={index} style={{ marginBottom: '10px' }}>
-                        <Message message={message} />
-                    </li>
-                ))}
+                {messages
+                    .filter(message => message.text && message.text.trim()) // Filter out empty messages
+                    .map((message, index) => (
+                        <li key={index} style={{ marginBottom: '10px' }}>
+                            <Message message={message} />
+                        </li>
+                    ))}
                 {/* Add a dummy div to act as a scroll target */}
                 <div ref={messagesEndRef} />
             </ul>
