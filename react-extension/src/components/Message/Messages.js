@@ -31,6 +31,7 @@ function Messages() {
                 // 'overflowY makes the box scrollable when necessary:
                 overflowY: 'auto', 
                 padding: '10px', 
+                height: '100%',
             }}
         >
             {/* 'listStyleType' being 'none' removes bullet points from the list. */}

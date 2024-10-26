@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Box, Typography, Paper } from '@mui/material';
-import { VolumeUp as VolumeUpIcon, StopCircle as StopCircleIcon } from '@mui/icons-material';
+import { VolumeUp as VolumeUpIcon, StopCircle as StopCircleIcon, Image as ImageIcon } from '@mui/icons-material';
 
 function Message({ message }) {
     // Whether the message is created by the user or the assistant:
@@ -59,10 +59,12 @@ function Message({ message }) {
                 }}
             >
                 <Box>
-                    {message.text && (
+                    {message.text && message.text.trim() ? (
                         <Typography variant="body1" gutterBottom>
                             {message.text}
                         </Typography>
+                    ) : (
+                        <ImageIcon style={{ color: '#a9a9a9' }} />
                     )}
                     <Box 
                         style={{ 

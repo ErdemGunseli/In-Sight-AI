@@ -102,7 +102,7 @@ def text_to_speech(text: str) -> bytes:
     return result
 
 
-def send_completion_request(_: user_dependency, messages: dict, encoded_image: str = None, model: AIModel = AIModel.GPT_4O, max_tokens: int = 300) -> str:
+def send_completion_request(_: user_dependency, messages: dict, encoded_image: str = None, model: AIModel = AIModel.GPT_4O, max_tokens: int = 100) -> str:
     # Ensuring the messages are in the correct format for the API:
     formatted_messages = messages
 

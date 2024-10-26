@@ -10,6 +10,7 @@ function Welcome() {
       justifyContent="center" 
       alignItems="center" 
       width="100%" 
+      height="100vh"
       padding="0.5rem 1rem"
       boxSizing="border-box"
     >
@@ -22,4 +23,3 @@ function Welcome() {
 }
 
 export default Welcome;
-

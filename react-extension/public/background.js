@@ -1,33 +1,20 @@
-function captureScreen() {
-  chrome.tabs.captureVisibleTab(null, { format: 'png' }, function(dataUrl) {
-    if (chrome.runtime.lastError) {
-      console.error(chrome.runtime.lastError);
-      return;
-    }
-
-    // Send the base64-encoded image data back to the sender
-    chrome.runtime.sendMessage({ action: 'captureScreenResponse', dataUrl });
-  });
-}
-
-// Example: Add a listener to capture the screen when the extension icon is clicked
-chrome.action.onClicked.addListener((tab) => {
-  captureScreen();
-});
-
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'captureScreen') {
-    captureScreen();
-  }
-});
+    chrome.tabs.captureVisibleTab(null, { format: 'png' }, (dataUrl) => {
+      if (chrome.runtime.lastError) {
+        console.error("Error capturing screen:", chrome.runtime.lastError);
+        sendResponse({ success: false, error: chrome.runtime.lastError.message });
+        return;
+      }
 
-chrome.commands.onCommand.addListener((command) => {
-  if (command === "open_extension") {
-    chrome.windows.getCurrent((window) => {
-      chrome.tabs.create({
-        url: chrome.runtime.getURL("index.html"),
-        windowId: window.id
-      });
+      const base64Data = dataUrl.replace(/^data:image\/png;base64,/, '');
+      console.log("Captured Base64 data:", base64Data);
+
+      // Send the captured image data back to the sender
+      sendResponse({ success: true, imageData: base64Data });
     });
+
+    // Indicate that the response will be sent asynchronously
+    return true;
   }
 });

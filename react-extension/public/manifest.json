@@ -22,7 +22,7 @@
     }
   },
 
-  "permissions": ["tabs", "activeTab", "scripting", "storage"],
+  "permissions": ["tabs", "tabCapture", "activeTab", "scripting", "storage"],
 
   "icons": {
     "16": "favicon.ico",

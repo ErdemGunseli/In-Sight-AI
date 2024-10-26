@@ -29,6 +29,7 @@ function App() {
         width="80vw" 
         height="80vh"
         position="relative"
+        overflow="hidden" // Ensure no extra scrollbars
       >
         {user ? (
           // Assistant Screen
@@ -40,7 +41,7 @@ function App() {
             <Box 
               flexGrow={1} 
               width="100%" 
-              overflow="auto"
+              overflow="auto" // Only this Box should have overflow
             >
               <Messages />
             </Box>
