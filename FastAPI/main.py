@@ -55,12 +55,12 @@ app.add_middleware(
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     errors = exc.errors()
     formatted_errors = [
-        f"{error['loc'][-1]}: {error['msg']}"
+        f"{error['loc'][-1].capitalize()} should {error['msg'].lower()}"
         for error in errors
     ]
     return JSONResponse(
         status_code=422,
-        content={"detail": formatted_errors},
+        content={"errors": formatted_errors},
     )
 
 
