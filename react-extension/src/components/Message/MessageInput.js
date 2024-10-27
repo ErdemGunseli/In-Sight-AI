@@ -51,19 +51,13 @@ function MessageInput() {
                     setMessages((prevMessages) => [...prevMessages, result]);
                     if (result.encoded_audio && !isMuted) {
                         setCurrentAudio(result.encoded_audio); // Set the current audio
+                        toggleAudio(); // Play audio if not muted
                     }
                 })
                 .catch(console.error)
                 .finally(() => setLoading(false));
         });
     };
-
-    // Effect to play audio when currentAudio changes
-    useEffect(() => {
-        if (currentAudio && !isMuted) {
-            toggleAudio(); // Play audio if not muted
-        }
-    }, [currentAudio, isMuted, toggleAudio]);
 
     const handleKeyPress = (event) => {
         if (event.key === 'Enter') {

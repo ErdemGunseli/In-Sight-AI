@@ -95,7 +95,7 @@ def speech_to_text(audio_bytes: bytes, file_name: str) -> str:
 
 def text_to_speech(text: str) -> bytes: 
     start_time = time.time()
-    result = client.audio.speech.create(model="tts-1-hd", voice="alloy", input=text).content
+    result = client.audio.speech.create(model="tts-1", voice="alloy", input=text).content
     time_taken = time.time() - start_time
 
     print(f"Time taken for text to speech: {time_taken:.4f} seconds")

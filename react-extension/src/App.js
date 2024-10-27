@@ -1,11 +1,8 @@
 import React from 'react';
-import { ThemeProvider } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
-import Typography from '@mui/material/Typography';
 
 
-import theme from './themes/theme';
 import Messages from './components/Message/Messages';
 import Header from './components/common/Header';
 import MessageInput from './components/Message/MessageInput';
@@ -18,7 +15,6 @@ function App() {
   const { user } = useUser();
 
   return (
-    <ThemeProvider theme={theme}>
       <Box 
         display="flex" 
         flexDirection="column" 
@@ -71,14 +67,25 @@ function App() {
         )}
         <VersionText />
       </Box>
-    </ThemeProvider>
   );
 }
 
 export default App;
 
 
-// TODO: Make Margins Consistent
-// TODO: More transitions
+// SAT:
+// TODO: Full Code Review
 // TODO: TOAST ERRORS
+// TODO: Extension Shortcut
 
+
+// SUN:
+// TODO: Image compression to reduce execution
+// TODO: Audio should output after request complete.
+
+
+// MON:
+// TODO: Basic Menus
+// Full Code Review
+// ACCESSIBILITY THEME SWITCHING
+// TODO: Make Margins Consistent

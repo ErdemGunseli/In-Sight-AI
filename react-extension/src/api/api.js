@@ -40,7 +40,15 @@ async function sendRequest(endpoint, options = {}) {
 
         // If the request has failed, providing an error message:
         if (!response.ok) {
-            const errorMessage = responseObject?.detail || response.statusText || 'An error has occurred, please try again later.';
+            let errorMessage;
+            if (responseObject && typeof responseObject === 'object') {
+                // Format the error message from the response object
+                errorMessage = Object.entries(responseObject)
+                    .map(([key, value]) => `${key}: ${formatErrorDetail(value)}`)
+                    .join(', ');
+            } else {
+                errorMessage = responseObject?.detail || response.statusText || 'An error has occurred, please try again later.';
+            }
             throw new ApiError(errorMessage, response.status);
         }
 
@@ -54,6 +62,17 @@ async function sendRequest(endpoint, options = {}) {
         }
         return null;
     }
+}
+
+function formatErrorDetail(detail) {
+    if (Array.isArray(detail)) {
+        return detail.map(item => formatErrorDetail(item)).join(', ');
+    } else if (typeof detail === 'object' && detail !== null) {
+        return Object.entries(detail)
+            .map(([key, value]) => `${key}: ${formatErrorDetail(value)}`)
+            .join(', ');
+    }
+    return detail;
 }
 
 export default sendRequest;

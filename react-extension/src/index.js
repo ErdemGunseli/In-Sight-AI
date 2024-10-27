@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import App from './App';
 import { UserProvider } from './context/UserContext';
@@ -13,7 +15,12 @@ ReactDOM.render(
     <ThemeProvider theme={theme}>
       <UserProvider>
         <MessageProvider>
-          <App />
+        <ToastContainer 
+                position='top-left'
+                autoClose={2500}
+                pauseOnHover
+                style={{ zIndex: 9999 }}
+              />          <App />
         </MessageProvider>
       </UserProvider>
     </ThemeProvider>
