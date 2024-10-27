@@ -1,7 +1,7 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, exceptions
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi.middleware import SlowAPIMiddleware
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import PlainTextResponse, JSONResponse
 from slowapi.errors import RateLimitExceeded
 from slowapi import _rate_limit_exceeded_handler
 from dotenv import load_dotenv
@@ -52,6 +52,19 @@ app.add_middleware(
 
 # TODO: Incorporate RealTime
 # TODO: After RealTime, Endpoint to change voice type, detail length, voice speed
+
+
+@app.exception_handler(exceptions.RequestValidationError)
+async def validation_exception_handler(request: Request, exc: exceptions.RequestValidationError):
+    errors = exc.errors()
+    formatted_errors = [
+        f"{error['loc'][-1]}: {error['msg']}"
+        for error in errors
+    ]
+    return JSONResponse(
+        status_code=422,
+        content={"errors": formatted_errors},
+    )
 
 
 if __name__ == "__main__":
