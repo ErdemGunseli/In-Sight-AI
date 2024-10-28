@@ -15,12 +15,14 @@ ReactDOM.render(
     <ThemeProvider theme={theme}>
       <UserProvider>
         <MessageProvider>
-        <ToastContainer 
-                position='top-left'
-                autoClose={2500}
-                pauseOnHover
-                style={{ zIndex: 9999 }}
-              />          <App />
+          <ToastContainer 
+            position='top-left'
+            autoClose={2500}
+            pauseOnHover
+            style={{ zIndex: 9999 }}
+            bodyStyle={{ fontSize: '1rem' }}
+          />
+          <App />
         </MessageProvider>
       </UserProvider>
     </ThemeProvider>

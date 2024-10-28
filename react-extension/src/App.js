@@ -75,7 +75,7 @@ export default App;
 
 // SAT:
 // TODO: Full Code Review
-// TODO: TOAST ERRORS
+// TODO: Proper error messages from backend
 // TODO: Extension Shortcut
 
 

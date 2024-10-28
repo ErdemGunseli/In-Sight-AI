@@ -1,7 +1,7 @@
-from fastapi import FastAPI, Request, exceptions
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi.middleware import SlowAPIMiddleware
-from fastapi.responses import PlainTextResponse, JSONResponse
+from fastapi.responses import PlainTextResponse
 from slowapi.errors import RateLimitExceeded
 from slowapi import _rate_limit_exceeded_handler
 from dotenv import load_dotenv
@@ -21,6 +21,16 @@ from database import engine
 import models
 
 from rate_limiter import limiter
+
+# Adding CORS middleware before other middlewares
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
@@ -40,31 +50,8 @@ async def root():
     return "Welcome to the In-Sight API! You can send requests to this URL. For documentation, please visit https://api.in-sight.ai/docs."
 
 
-# Adding client domains to avoid CORS blocking:
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
 # TODO: Incorporate RealTime
 # TODO: After RealTime, Endpoint to change voice type, detail length, voice speed
-
-
-@app.exception_handler(exceptions.RequestValidationError)
-async def validation_exception_handler(request: Request, exc: exceptions.RequestValidationError):
-    errors = exc.errors()
-    formatted_errors = [
-        f"{error['loc'][-1]}: {error['msg']}"
-        for error in errors
-    ]
-    return JSONResponse(
-        status_code=422,
-        content={"errors": formatted_errors},
-    )
 
 
 if __name__ == "__main__":

@@ -17,3 +17,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
   }
 });
+
+chrome.commands.onCommand.addListener((command) => {
+  if (command === "open_extension") {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs[0]) {
+        chrome.action.openPopup({ tabId: tabs[0].id });
+      }
+    });
+  }
+});
