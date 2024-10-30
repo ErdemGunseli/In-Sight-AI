@@ -16,9 +16,8 @@
   "commands": {
     "open_extension": {
       "suggested_key": {
-        "default": "Ctrl+Shift+Y",
-        "mac": "Command+Shift+Y"
-      },
+        "default": "Ctrl+Shift+Y"
+        },
       "description": "Open the extension"
     }
   },

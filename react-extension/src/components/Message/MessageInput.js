@@ -53,19 +53,29 @@ function MessageInput() {
           return completion(textInput, compressedImageData, generateAudio);
         })
         .then((result) => {
-          // Update the user message with data from the backend
-          Object.assign(userMessage, result);
+          // Optionally update userMessage with its assigned ID from the backend, if provided
+          if (result.userMessageId) {
+            userMessage.id = result.userMessageId;
+            // Update the user's message in the state
+            addMessage({ ...userMessage });
+          }
 
-          // Force a state update to reflect changes
-          addMessage({ ...userMessage });
+          // Add the assistant's response as a new message
+          const assistantMessage = {
+            type: 'assistant',
+            text: result.text,
+            encoded_audio: result.encoded_audio,
+            id: result.id, // Assuming the assistant's message ID is returned as 'id'
+          };
+          addMessage(assistantMessage);
 
+          // Play audio if available
           if (result.encoded_audio && !isMuted) {
-            toggleAudio(result.encoded_audio, result.id); // Use the actual ID from the backend
+            toggleAudio(result.encoded_audio, assistantMessage.id);
           }
         })
         .catch((error) => {
           console.error('Error:', error);
-          alert('An error occurred during processing.');
         })
         .finally(() => {
           setLoading(false);

@@ -27,7 +27,13 @@ export const MessageProvider = ({ children }) => {
   };
 
   const addMessage = (message) => {
-    setMessages((prevMessages) => [...prevMessages, message]);
+    setMessages((prevMessages) => {
+      // Check if the message already exists
+      if (prevMessages.some((msg) => msg.id === message.id)) {
+        return prevMessages; // Do not add duplicate
+      }
+      return [...prevMessages, message];
+    });
   };
 
   // Refreshing the message data when the MessageProvider mounts:

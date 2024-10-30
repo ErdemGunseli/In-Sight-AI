@@ -74,14 +74,13 @@ export default App;
 
 
 // TODO: Full Code Review
+// TODO: Make Margins Consistent
+
 // TODO: Proper error messages from backend
 // TODO: Extension Shortcut
 
 
-// TODO: Audio should output after request complete.
-
-
 // TODO: Basic Menus
 // Full Code Review
+
 // ACCESSIBILITY THEME SWITCHING
-// TODO: Make Margins Consistent
