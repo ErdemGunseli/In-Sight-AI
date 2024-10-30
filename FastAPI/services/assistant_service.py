@@ -189,13 +189,12 @@ async def completion(db: db_dependency, user: user_dependency, text: Optional[st
             encoded_audio = base64.b64encode(audio_bytes).decode("utf-8")
         
         # Adding the assistant response to the db:
-        add_message(db, user, MessageType.ASSISTANT, completion_text, encoded_audio)
+        assistant_message = add_message(db, user, MessageType.ASSISTANT, completion_text, encoded_audio)
 
         time_taken = time.time() - start_time
         print(f"Total time taken for completion (incl image processing, TTS, STT): {time_taken:.4f} seconds")
 
-        # Need to use the string value of the enum to avoid issues with JSON serialization:
-        return {"type": MessageType.ASSISTANT.value, "text": completion_text,  "encoded_audio": encoded_audio}
+        return assistant_message
 
     except HTTPException as h:
         # Raising HTTP Exceptions again without modification:
