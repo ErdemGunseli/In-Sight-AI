@@ -26,6 +26,7 @@ class TokenResponse(BaseModel):
 
 
 class MessageResponse(BaseModel):
+    id: int
     type: MessageType = Field()
     text: Optional[str] = Field(None)
     encoded_audio: Optional[str] = Field(None)

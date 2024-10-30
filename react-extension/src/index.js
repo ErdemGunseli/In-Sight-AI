@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import App from './App';
 import { UserProvider } from './context/UserContext';
 import { MessageProvider } from './context/MessageContext';
+import { AudioPlayerProvider } from './context/AudioPlayerContext';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './themes/theme';
 
@@ -15,14 +16,16 @@ ReactDOM.render(
     <ThemeProvider theme={theme}>
       <UserProvider>
         <MessageProvider>
-          <ToastContainer 
-            position='top-left'
-            autoClose={2500}
-            pauseOnHover
-            style={{ zIndex: 9999 }}
-            bodyStyle={{ fontSize: '1rem' }}
-          />
-          <App />
+          <AudioPlayerProvider>
+            <ToastContainer 
+              position='top-left'
+              autoClose={2500}
+              pauseOnHover
+              style={{ zIndex: 9999 }}
+              bodyStyle={{ fontSize: '1rem' }}
+            />
+            <App />
+          </AudioPlayerProvider>
         </MessageProvider>
       </UserProvider>
     </ThemeProvider>

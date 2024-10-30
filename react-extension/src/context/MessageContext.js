@@ -1,14 +1,11 @@
-import { useState, useEffect, createContext, useContext } from 'react';
-
+import React, { useState, useEffect, createContext, useContext } from 'react';
 import { getMessages } from '../api/assistant';
 
 // Creating a context for the message data:
 const MessageContext = createContext();
 
-
 export const MessageProvider = ({ children }) => {
   const [messages, setMessages] = useState([]);
-
 
   const refreshMessages = async () => {
     setMessages([]);
@@ -26,9 +23,12 @@ export const MessageProvider = ({ children }) => {
   };
 
   const clearMessages = () => {
-    setMessages([])
-  }
+    setMessages([]);
+  };
 
+  const addMessage = (message) => {
+    setMessages((prevMessages) => [...prevMessages, message]);
+  };
 
   // Refreshing the message data when the MessageProvider mounts:
   useEffect(() => {
@@ -38,9 +38,10 @@ export const MessageProvider = ({ children }) => {
     fetchData();
   }, []);
 
-
   return (
-    <MessageContext.Provider value={{ messages, setMessages, refreshMessages, clearMessages }}>
+    <MessageContext.Provider
+      value={{ messages, setMessages, refreshMessages, clearMessages, addMessage }}
+    >
       {children}
     </MessageContext.Provider>
   );
@@ -48,9 +49,8 @@ export const MessageProvider = ({ children }) => {
 
 export default MessageContext;
 
-
 // Custom hook to simplify usage
 export const useMessages = () => {
-    return useContext(MessageContext);
+  return useContext(MessageContext);
 };
 

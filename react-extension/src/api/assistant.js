@@ -13,7 +13,7 @@ const testBase64 = "/9j/4AAQSkZJRgABAQEASABIAAD/4gxYSUNDX1BST0ZJTEUAAQEAAAxITGlu
 export async function completion(text, encodedImage, generateAudio) {
     const formData = new FormData();
     formData.append('text', text);
-    formData.append('encoded_image', testBase64);
+    formData.append('encoded_image', encodedImage);
     formData.append('generate_audio', generateAudio);
 
     // Debugging: Log the FormData contents

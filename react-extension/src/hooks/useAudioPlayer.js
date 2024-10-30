@@ -1,35 +1,18 @@
-import { useState, useRef, useEffect } from 'react';
+import { useContext } from 'react';
+import AudioPlayerContext from '../context/AudioPlayerContext';
 
-function useAudioPlayer(encodedAudio) {
-    const [isPlaying, setIsPlaying] = useState(false);
-    const audioRef = useRef(null);
+function useAudioPlayer(encodedAudio, messageId) {
+  const { isPlaying, playingMessageId, toggleAudio } = useContext(AudioPlayerContext);
 
-    useEffect(() => {
-        if (encodedAudio) {
-            audioRef.current = new Audio(`data:audio/wav;base64,${encodedAudio}`);
-            audioRef.current.addEventListener('ended', () => setIsPlaying(false));
-        }
+  const isMessagePlaying = isPlaying && playingMessageId === messageId;
 
-        return () => {
-            if (audioRef.current) {
-                audioRef.current.pause();
-                audioRef.current.removeEventListener('ended', () => setIsPlaying(false));
-            }
-        };
-    }, [encodedAudio]);
+  const handleToggleAudio = () => {
+    if (encodedAudio && messageId !== undefined) {
+      toggleAudio(encodedAudio, messageId);
+    }
+  };
 
-    const toggleAudio = () => {
-        if (audioRef.current) {
-            if (isPlaying) {
-                audioRef.current.pause();
-                setIsPlaying(false);
-            } else {
-                audioRef.current.play().then(() => setIsPlaying(true)).catch(console.error);
-            }
-        }
-    };
-
-    return { isPlaying, toggleAudio };
+  return { isPlaying: isMessagePlaying, toggleAudio: handleToggleAudio };
 }
 
 export default useAudioPlayer;

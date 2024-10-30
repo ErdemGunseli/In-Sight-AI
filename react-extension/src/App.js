@@ -25,7 +25,7 @@ function App() {
         width="80vw" 
         height="80vh"
         position="relative"
-        overflow="hidden" // Ensure no extra scrollbars
+        overflow="hidden"
       >
         {user ? (
           // Assistant Screen
@@ -39,11 +39,11 @@ function App() {
               flexDirection="column"
               flexGrow={1} 
               width="100%" 
-              overflow="hidden" // Prevent overflow from the container itself
+              overflow="hidden"
             >
               <Box 
                 flexGrow={1} 
-                overflow="auto" // Allow scrolling within the Messages area
+                overflow="auto"
               >
                 <Messages />
               </Box>
@@ -73,18 +73,14 @@ function App() {
 export default App;
 
 
-// SAT:
 // TODO: Full Code Review
 // TODO: Proper error messages from backend
 // TODO: Extension Shortcut
 
 
-// SUN:
-// TODO: Image compression to reduce execution
 // TODO: Audio should output after request complete.
 
 
-// MON:
 // TODO: Basic Menus
 // Full Code Review
 // ACCESSIBILITY THEME SWITCHING
