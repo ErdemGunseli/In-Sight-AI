@@ -74,12 +74,9 @@ export default App;
 
 
 // TODO: Full Code Review
-// TODO: Make Margins Consistent
-
 // TODO: Proper error messages from backend
 // TODO: Guide user to set extension shortcut
 
+
 // TODO: Basic Menus
 // Full Code Review
-
-// ACCESSIBILITY THEME SWITCHING

@@ -33,11 +33,11 @@ function Messages() {
             }}
         >
             {/* 'listStyleType' being 'none' removes bullet points from the list. */}
-            <ul style={{ padding: 0, margin: 0, listStyleType: 'none' }}>
+            <ul style={{ padding: 0, margin: 0, listStyleType: 'none' }} role="list" aria-label="Conversation messages">
                 {messages
                     .filter(message => message.text && message.text.trim()) // Filter out empty messages
                     .map((message, index) => (
-                        <li key={index} style={{ marginBottom: '10px' }}>
+                        <li key={index} style={{ marginBottom: '10px' }} role="listitem">
                             <Message message={message} />
                         </li>
                     ))}

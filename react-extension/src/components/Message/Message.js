@@ -12,7 +12,10 @@ function Message({ message }) {
 
   const messageId = message.id;
 
-  const { isPlaying, toggleAudio } = useAudioPlayer(message.encoded_audio, messageId);
+  const { isPlaying, toggleAudio } = useAudioPlayer(
+    message.encoded_audio,
+    messageId
+  );
 
   const handleClick = () => {
     if (message.encoded_audio) {
@@ -20,14 +23,19 @@ function Message({ message }) {
     }
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      handleClick();
+    }
+  };
+
   return (
     <Box
+      component="div"
       display="flex"
       justifyContent={isUser ? 'flex-end' : 'flex-start'}
-      cursor={message.encoded_audio ? 'pointer' : 'default'}
       maxWidth="100%"
       width="100%"
-      onClick={handleClick}
     >
       <Paper
         elevation={3}
@@ -38,24 +46,49 @@ function Message({ message }) {
           textAlign: isUser ? 'right' : 'left',
         }}
       >
-        <Box>
+        <Box
+          onClick={handleClick}
+          onKeyDown={handleKeyDown}
+          tabIndex={message.encoded_audio ? 0 : -1}
+          role={message.encoded_audio ? 'button' : 'group'}
+          aria-label={
+            message.encoded_audio
+              ? isPlaying
+                ? 'Stop playback'
+                : 'Play audio message'
+              : 'Message'
+          }
+          sx={{
+            cursor: message.encoded_audio ? 'pointer' : 'default',
+            outline: 'none',
+          }}
+        >
           {message.text && message.text.trim() ? (
             <Typography variant="body1" gutterBottom>
               {message.text}
             </Typography>
           ) : (
-            <ImageIcon style={{ color: '#a9a9a9' }} />
+            <ImageIcon
+              style={{ color: '#a9a9a9' }}
+              aria-label="Image message"
+            />
           )}
-          <Box
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              position: 'relative',
-            }}
-          >
-            {message.encoded_audio && (isPlaying ? <StopCircleIcon /> : <VolumeUpIcon />)}
-          </Box>
+          {message.encoded_audio && (
+            <Box
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                alignItems: 'center',
+                position: 'relative',
+              }}
+            >
+              {isPlaying ? (
+                <StopCircleIcon aria-label="Stop audio" />
+              ) : (
+                <VolumeUpIcon aria-label="Play audio" />
+              )}
+            </Box>
+          )}
         </Box>
       </Paper>
     </Box>

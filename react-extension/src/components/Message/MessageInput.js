@@ -37,7 +37,9 @@ function MessageInput() {
   };
 
   const handleCaptureScreen = (userMessage) => {
+    console.log('Sending message to background script...');
     chrome.runtime.sendMessage({ action: 'captureScreen' }, (response) => {
+      console.log('Received response from background script:', response);
       if (!response || !response.success) {
         console.error('Error capturing screen:', response?.error || 'No response received');
         alert('Error capturing screen.');
@@ -53,29 +55,25 @@ function MessageInput() {
           return completion(textInput, compressedImageData, generateAudio);
         })
         .then((result) => {
-          // Optionally update userMessage with its assigned ID from the backend, if provided
-          if (result.userMessageId) {
-            userMessage.id = result.userMessageId;
-            // Update the user's message in the state
-            addMessage({ ...userMessage });
-          }
-
-          // Add the assistant's response as a new message
+          // Create a new message object for the assistant's response
           const assistantMessage = {
             type: 'assistant',
             text: result.text,
             encoded_audio: result.encoded_audio,
-            id: result.id, // Assuming the assistant's message ID is returned as 'id'
+            id: result.id,
+            // Include any other properties from the result as needed
           };
+
+          // Add the assistant's message to the messages list
           addMessage(assistantMessage);
 
-          // Play audio if available
           if (result.encoded_audio && !isMuted) {
-            toggleAudio(result.encoded_audio, assistantMessage.id);
+            toggleAudio(result.encoded_audio, result.id); // Use the actual ID from the backend
           }
         })
         .catch((error) => {
           console.error('Error:', error);
+          alert('An error occurred during processing.');
         })
         .finally(() => {
           setLoading(false);
@@ -83,8 +81,8 @@ function MessageInput() {
     });
   };
 
-  const handleKeyPress = (event) => {
-    if (event.key === 'Enter') {
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' && event.target === textInputRef.current) {
       handleSendMessage();
     }
   };
@@ -105,13 +103,20 @@ function MessageInput() {
         fullWidth
         value={textInput}
         onChange={(e) => setTextInput(e.target.value)}
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyDown}
         inputRef={textInputRef}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
-              <IconButton onClick={toggleMute}>
-                {isMuted ? <VolumeOffIcon /> : <VolumeUpIcon />}
+              <IconButton
+                onClick={toggleMute}
+                aria-label={isMuted ? 'Turn On Audio' : 'Turn Off Audio'}
+              >
+                {isMuted ? (
+                  <VolumeOffIcon />
+                ) : (
+                  <VolumeUpIcon />
+                )}
               </IconButton>
               <IconButton
                 onClick={handleSendMessage}
@@ -122,9 +127,14 @@ function MessageInput() {
                   color: '#ffffff',
                 }}
                 disabled={loading}
+                aria-label="Send message"
               >
                 {loading ? (
-                  <CircularProgress size={24} style={{ color: '#ffffff' }} />
+                  <CircularProgress
+                    size={24}
+                    style={{ color: '#ffffff' }}
+                    aria-label="Sending..."
+                  />
                 ) : (
                   <AutoFixHighIcon />
                 )}
@@ -135,7 +145,10 @@ function MessageInput() {
         sx={{ flexGrow: 1, ml: 2 }}
       />
       <Box display="flex" alignItems="center">
-        <IconButton sx={{ borderRadius: '50%', color: '#1976d2', mx: 1 }}>
+        <IconButton
+          sx={{ borderRadius: '50%', color: '#1976d2', mx: 1 }}
+          aria-label="Audio settings"
+        >
           <GraphicEqIcon />
         </IconButton>
       </Box>

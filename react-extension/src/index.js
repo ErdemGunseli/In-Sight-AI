@@ -9,11 +9,13 @@ import { UserProvider } from './context/UserContext';
 import { MessageProvider } from './context/MessageContext';
 import { AudioPlayerProvider } from './context/AudioPlayerContext';
 import { ThemeProvider } from '@mui/material/styles';
+import { CssBaseline } from '@mui/material';
 import theme from './themes/theme';
 
 ReactDOM.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
+      <CssBaseline />
       <UserProvider>
         <MessageProvider>
           <AudioPlayerProvider>

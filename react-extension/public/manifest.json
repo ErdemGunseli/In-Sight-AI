@@ -3,21 +3,29 @@
   "version": "1.0",
   "manifest_version": 3,
   "description": "AI-powered browser extension that generates interactive image descriptions for visually impaired users.",
-
   "action": {
     "default_popup": "index.html",
-    "default_icon": "logo512.png"
+    "default_icon": {
+      "16": "assets/logo16.png",
+      "48": "assets/logo48.png",
+      "128": "assets/logo128.png"
+    }
   },
-
   "background": {
     "service_worker": "background.js"
   },
-
-  "permissions": ["tabs", "tabCapture", "activeTab", "scripting", "storage"],
-
+  "permissions": [
+    "tabs",
+    "tabCapture",
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
   "icons": {
-    "16": "favicon.ico",
-    "48": "logo192.png",
-    "128": "logo512.png"
+    "16": "assets/logo16.png",
+    "48": "assets/logo48.png",
+    "128": "assets/logo128.png",
+    "192": "assets/logo192.png",
+    "512": "assets/logo512.png"
   }
 }

@@ -62,6 +62,7 @@ function LoginWindow({ isOpen, onClose }) {
             onChange={(e) => setName(e.target.value)}
             fullWidth
             required
+            inputProps={{ 'aria-label': 'Name' }}
           />
         )}  
 
@@ -73,6 +74,7 @@ function LoginWindow({ isOpen, onClose }) {
           onChange={(e) => setEmail(e.target.value)}
           fullWidth
           required
+          inputProps={{ 'aria-label': 'Email' }}
         />
 
         <TextField
@@ -83,6 +85,7 @@ function LoginWindow({ isOpen, onClose }) {
           onChange={(e) => setPassword(e.target.value)}
           fullWidth
           required
+          inputProps={{ 'aria-label': 'Password' }}
         />
 
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', mt: 1 }}>
@@ -90,7 +93,7 @@ function LoginWindow({ isOpen, onClose }) {
             {isSignUp ? 'Already with us?' : 'First time here?'}
           </Typography>
 
-          <Button variant="text" onClick={() => setIsSignUp(!isSignUp)} >
+          <Button variant="text" onClick={() => setIsSignUp(!isSignUp)} aria-label={isSignUp ? 'Switch to login form' : 'Switch to sign-up form'} >
             {isSignUp ? 'Log In' : 'Join In-Sight'}
           </Button>
         </Box>
