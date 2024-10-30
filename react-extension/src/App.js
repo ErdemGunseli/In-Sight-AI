@@ -77,8 +77,7 @@ export default App;
 // TODO: Make Margins Consistent
 
 // TODO: Proper error messages from backend
-// TODO: Extension Shortcut
-
+// TODO: Guide user to set extension shortcut
 
 // TODO: Basic Menus
 // Full Code Review
