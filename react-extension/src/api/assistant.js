@@ -27,3 +27,12 @@ export async function completion(text, encodedImage, generateAudio) {
         body: formData
     });
 }
+
+
+export async function deleteMessages() {
+  const response = await sendRequest('/messages/', {
+    method: 'DELETE',
+  });
+
+  return response;
+}

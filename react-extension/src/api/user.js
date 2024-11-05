@@ -21,3 +21,12 @@ export async function createUser(name, email, password) {
 export async function getCurrentUser() {
   return await sendRequest('/user/');
 }
+
+
+export async function deleteUser() {
+  const response = await sendRequest('/user/', {
+    method: 'DELETE',
+  });
+
+  return response;
+}

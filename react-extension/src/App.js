@@ -75,8 +75,6 @@ export default App;
 
 // TODO: Full Code Review
 // TODO: Proper error messages from backend
-// TODO: Guide user to set extension shortcut
 
-
-// TODO: Basic Menus
+// FIXME: FIX Basic Menus
 // Full Code Review
