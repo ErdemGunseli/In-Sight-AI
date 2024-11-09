@@ -1,5 +1,4 @@
 from typing import Optional
-from datetime import datetime
 
 from pydantic import BaseModel, Field, EmailStr
 
@@ -16,6 +15,7 @@ class UserResponse(BaseModel):
     id: int
     name: str = Field()
     email: EmailStr = Field()
+    is_admin: bool = Field()
 
     class Config: from_attributes = True
 

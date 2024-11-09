@@ -12,6 +12,7 @@ bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # A JWT needs an algorithm and secret key:
 HASH_SECRET_KEY = os.getenv("HASH_SECRET_KEY")
 HASH_ALGORITHM = os.getenv("HASH_ALGORITHM")
+
 # The time to live for the JWT:
 TOKEN_TTL = timedelta(minutes=int(os.getenv("TOKEN_TTL")))
 

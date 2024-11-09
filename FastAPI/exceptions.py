@@ -29,3 +29,10 @@ class NoMessageException(HTTPException):
 class UnprocessableMessageException(HTTPException):
     def __init__(self, detail="Please ensure your message is in a valid format."):
         super().__init__(status_code=st.HTTP_400_BAD_REQUEST, detail=detail)
+
+
+class APIRequestException(HTTPException):
+    def __init__(self, detail="Something went wrong while processing your request. Please try again later."):
+        super().__init__(status_code=500, detail=detail)
+
+

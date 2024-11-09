@@ -11,7 +11,7 @@ from models import User
 from security import HASH_SECRET_KEY, HASH_ALGORITHM
 
 
-# Using a generator as a context manager to manage the DB session:
+# Using generator as context manager to manage the DB session:
 def get_db() -> Generator[Session, None, None]:
 
     # Creating a new session to connect to the DB, using the session factory:
@@ -31,7 +31,7 @@ def get_db() -> Generator[Session, None, None]:
         db.close()
 
 
-# Dependency Injection - if an object of type db_dependency (which is of type Session) is not provided, 
+# Dependency injection - if an object of type db_dependency (which is of type Session) is not provided, 
 # FastAPI will automatically call get_db to obtain a DB session.
 db_dependency = Annotated[Session, Depends(get_db)]
 
@@ -52,9 +52,10 @@ async def get_current_user(db: db_dependency, token: token_dependency) -> User:
 
         # Extracting the user id from the payload dictionary:
         # The subject of a JWT needs to be a string, so converting back to integer:
-        user_id: Optional[int] = int(payload.get("sub"))
+        user_id: Optional[int] = payload.get("sub")
 
         if user_id is None: raise JWTError
+        user_id = int(user_id)
 
     except JWTError as e: raise JWTException from e
 

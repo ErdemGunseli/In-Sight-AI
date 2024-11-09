@@ -1,6 +1,6 @@
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
-from sqlalchemy import Column, Integer, String, ForeignKey, Enum, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, Enum, DateTime, Boolean
 
 from database import Base
 from enums import MessageType
@@ -12,6 +12,7 @@ class User(Base):
     name = Column(String, index=True, nullable=False)
     email = Column(String, index=True, unique=True, nullable=False)
     password = Column(String, nullable=False)
+    is_admin = Column(Boolean, default=False)
 
     messages = relationship("Message", back_populates="user", cascade="all, delete-orphan")
 

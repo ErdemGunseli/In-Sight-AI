@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi.middleware import SlowAPIMiddleware
 from fastapi.responses import PlainTextResponse
@@ -50,8 +50,11 @@ async def root():
     return "Welcome to the In-Sight API! You can send requests to this URL. For documentation, please visit https://api.in-sight.ai/docs."
 
 
+# TODO: Incorporate Video
+# TODO: Incorporate NLP & ML
 # TODO: Incorporate RealTime
 # TODO: After RealTime, Endpoint to change voice type, detail length, voice speed
+
 
 
 if __name__ == "__main__":

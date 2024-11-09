@@ -8,7 +8,7 @@ import time
 from openai import OpenAI
 from fastapi import UploadFile, HTTPException
 
-from exceptions import NoMessageException, UnprocessableMessageException
+from exceptions import NoMessageException, UnprocessableMessageException, APIRequestException
 from dependencies import db_dependency, user_dependency
 from models import Message
 from strings import ASSISTANT_CONTEXT
@@ -110,7 +110,7 @@ def send_completion_request(_: user_dependency, messages: dict, encoded_image: s
 
     if encoded_image is not None: 
         # If there is an image, adding it to the user's last message (all past images excluded due to context window limits):
-        # (There will always be a content field due to the formatting method.)
+        # There will always be a content field due to the formatting method.
         formatted_messages[-1]["content"].append({"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{encoded_image}"}})
         
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}"}
@@ -119,11 +119,11 @@ def send_completion_request(_: user_dependency, messages: dict, encoded_image: s
     # Sending the completion request:
     response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
 
-    # Check if the response is successful
+    # Checking if the response is successful:
     if response.status_code != 200:
         print(f"API request failed with status code {response.status_code}")
         print(f"Response content: {response.text}")
-        raise HTTPException(status_code=response.status_code, detail="API request failed")
+        raise APIRequestException
 
     # Extracting the response content:
     response_data = response.json()
@@ -147,7 +147,7 @@ def send_completion_request(_: user_dependency, messages: dict, encoded_image: s
 
 async def completion(db: db_dependency, user: user_dependency, text: Optional[str],
     audio: Optional[UploadFile], image: Optional[UploadFile], encoded_image: Optional[str] = None,
-    model: AIModel = AIModel.GPT_4O, generate_audio: bool = False, max_tokens: int = 300) -> dict: 
+    model: AIModel = AIModel.GPT_4O, generate_audio: bool = False, max_tokens: int = 300, context_message_count: int= 20) -> dict: 
 
     print("\n\n\n")
     start_time = time.time()
@@ -177,7 +177,7 @@ async def completion(db: db_dependency, user: user_dependency, text: Optional[st
         add_message(db, user, MessageType.USER, user_text)
 
         # Getting all the messages associated to that user:
-        messages = get_messages(db, user, 100)
+        messages = get_messages(db, user, context_message_count)
 
         # Sending the completion request to the API:
         completion_text = send_completion_request(user, messages, encoded_image, model, max_tokens=max_tokens)
