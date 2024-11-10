@@ -15,66 +15,59 @@ function App() {
   const { user } = useUser();
 
   return (
-      <Box 
-        display="flex" 
-        flexDirection="column" 
-        justifyContent="space-between" 
-        alignItems="center" 
-        minWidth="500px" 
-        minHeight="600px"
-        width="80vw" 
-        height="80vh"
-        position="relative"
-        overflow="hidden"
-      >
-        {user ? (
-          // Assistant Screen
-          <>
-            <Box height="60px" width="100%">
-              <Header />
+    
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        minWidth: 500,
+        minHeight: 600,
+        width: '80vw',
+        height: '80vh',
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
+      {user ? (
+        <>
+          <Header />
+          <Divider sx={{ width: '100%' }} />
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              flexGrow: 1,
+              width: '100%',
+              overflow: 'hidden',
+            }}
+          >
+            <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
+              <Messages />
             </Box>
-            <Divider sx={{ width: '100%' }} />
-            <Box 
-              display="flex"
-              flexDirection="column"
-              flexGrow={1} 
-              width="100%" 
-              overflow="hidden"
+            <Box
+              sx={{
+                position: 'sticky',
+                bottom: 0,
+                width: '100%',
+              }}
             >
-              <Box 
-                flexGrow={1} 
-                overflow="auto"
-              >
-                <Messages />
-              </Box>
-              <Box 
-                display="flex" 
-                flexDirection="column"
-                alignItems="center" 
-                justifyContent="center" 
-                width="100%" 
-                position="sticky" 
-                bottom={0} 
-              >
-                <Divider sx={{ width: '100%' }} />
-                <MessageInput />
-              </Box>
+              <Divider sx={{ width: '100%' }} />
+              <MessageInput />
             </Box>
-          </>
-        ) : (
-          // Welcome Screen
-          <Welcome />
-        )}
-        <VersionText />
-      </Box>
+          </Box>
+        </>
+      ) : (
+        <Welcome />
+      )}
+      <VersionText />
+    </Box>
   );
 }
 
 export default App;
 
 
-// TODO: Full Code Review
 // TODO: Proper error messages from backend
 
-// FIXME: FIX Basic Menus
-// Full Code Review

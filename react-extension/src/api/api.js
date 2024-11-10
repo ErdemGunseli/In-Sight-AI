@@ -1,10 +1,9 @@
 import { toast } from 'react-toastify';
 import config from '../config.json';
 
-
 export const BASE_URL = config.BASE_URL;
 
-
+// Creating a custom API Error to encapsulate the status code and message:
 class ApiError extends Error {
     constructor(message, status) {
         super(message)
@@ -13,9 +12,10 @@ class ApiError extends Error {
     }
 }
 
-
-// Makes a HTTP request to the specified endpoint and handles the response.
-// 'options' can be used to specify the method, headers, body, etc.
+/*
+This function makes a HTTP request to the specified endpoint and handles the response.
+'options' can be used to specify the method, headers, body, etc.
+*/
 async function sendRequest(endpoint, options = {}) {
     options.headers = options.headers || {};
 
@@ -24,11 +24,10 @@ async function sendRequest(endpoint, options = {}) {
     if (token) { options.headers['Authorization'] = `Bearer ${token}`;}
 
     try {
-        // Sending the request and obtaining content type:
+        // Sending the request and obtaining content type of the response:
         const response = await fetch(`${BASE_URL}${endpoint}`, options);
         const contentType = response.headers.get('content-type');
         let responseObject = null;
-
 
         if (response.status !== 204 && contentType && contentType.includes('application/json')) {
             try {

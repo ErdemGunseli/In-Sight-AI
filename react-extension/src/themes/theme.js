@@ -64,7 +64,6 @@ const theme = createTheme({
         },
         text: {
           fontSize: '1rem',
-          color: 'transparent',
           backgroundImage: 'linear-gradient(135deg, #6a5acd 0%, #1976d2 20%, #1976d2 80%, #6a5acd 100%)',
           backgroundClip: 'text',
           WebkitBackgroundClip: 'text',
@@ -129,8 +128,8 @@ const theme = createTheme({
     MuiPaper: {
       styleOverrides: {
         root: {
-          padding: '15px',
-          borderRadius: '10px',
+          padding: 10,
+          borderRadius: 10,
         },
         assistant: {
           backgroundImage: 'linear-gradient(135deg, #6a5acd 0%, #1976d2 20%, #1976d2 80%, #6a5acd 100%)',

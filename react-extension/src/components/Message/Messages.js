@@ -2,12 +2,13 @@ import React, { useEffect, useRef } from 'react';
 import Message from './Message';
 import { useMessages } from '../../context/MessageContext';
 import { useUser } from '../../context/UserContext';
-import { Box } from '@mui/material';
+import { Box, List, ListItem } from '@mui/material';
 
 function Messages() {
     const { user } = useUser();
     const { messages, refreshMessages } = useMessages();
 
+    // Dummy ref to scroll to the bottom:
     const messagesEndRef = useRef(null);
 
     useEffect(() => {
@@ -27,23 +28,20 @@ function Messages() {
     return (
         <Box 
             sx={{ 
-                // 'overflowY makes the box scrollable when necessary:
-                padding: '10px', 
                 height: '100%',
             }}
         >
-            {/* 'listStyleType' being 'none' removes bullet points from the list. */}
-            <ul style={{ padding: 0, margin: 0, listStyleType: 'none' }} role="list" aria-label="Conversation messages">
+            <List sx={{ padding: 0, margin: 0 }} aria-label="Conversation messages">
                 {messages
-                    .filter(message => message.text && message.text.trim()) // Filter out empty messages
+                    // Filtering out empty messages:
+                    .filter(message => message.text?.trim())
                     .map((message, index) => (
-                        <li key={index} style={{ marginBottom: '10px' }} role="listitem">
+                        <ListItem key={index}>
                             <Message message={message} />
-                        </li>
+                        </ListItem>
                     ))}
-                {/* Add a dummy div to act as a scroll target */}
                 <div ref={messagesEndRef} />
-            </ul>
+            </List>
         </Box>
     );
 }

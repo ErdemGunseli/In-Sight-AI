@@ -24,9 +24,5 @@ export async function getCurrentUser() {
 
 
 export async function deleteUser() {
-  const response = await sendRequest('/user/', {
-    method: 'DELETE',
-  });
-
-  return response;
+  return await sendRequest('/user/', { method: 'DELETE' });
 }

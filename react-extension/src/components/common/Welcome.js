@@ -9,15 +9,12 @@ function Welcome() {
       flexDirection="column"
       justifyContent="center" 
       alignItems="center" 
-      width="100%" 
-      height="100vh"
-      padding="0.5rem 1rem"
-      boxSizing="border-box"
+      sx={{ width: '100%', height: '100vh', p: '0.5rem 1rem' }}
     >
-      <Typography variant="title" sx={{ fontSize: '2.5rem', mb: '10px' }}>
+      <Typography variant="title" sx={{ fontSize: '2.5rem', mb: 2 }}>
         in-sight.ai
       </Typography>
-      <LoginButton sx={{ fontSize: '1.5rem' }}/>
+      <LoginButton sx={{ fontSize: '1.75rem' }}/>
     </Box>
   );
 }

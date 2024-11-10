@@ -1,32 +1,15 @@
 import React from 'react';
 import { Box, Typography, Paper } from '@mui/material';
-import {
-  VolumeUp as VolumeUpIcon,
-  StopCircle as StopCircleIcon,
-  Image as ImageIcon,
-} from '@mui/icons-material';
+import { VolumeUp, StopCircle, Image } from '@mui/icons-material';
 import useAudioPlayer from '../../hooks/useAudioPlayer';
 
 function Message({ message }) {
   const isUser = message.type === 'user';
+  const { isPlaying, toggleAudio } = useAudioPlayer(message.encoded_audio, message.id);
 
-  const messageId = message.id;
-
-  const { isPlaying, toggleAudio } = useAudioPlayer(
-    message.encoded_audio,
-    messageId
-  );
-
-  const handleClick = () => {
-    if (message.encoded_audio) {
-      toggleAudio();
-    }
-  };
-
+  const handleClick = () => message.encoded_audio && toggleAudio();
   const handleKeyDown = (event) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      handleClick();
-    }
+    if (event.key === 'Enter' || event.key === ' ') handleClick();
   };
 
   return (
@@ -51,27 +34,18 @@ function Message({ message }) {
           onKeyDown={handleKeyDown}
           tabIndex={message.encoded_audio ? 0 : -1}
           role={message.encoded_audio ? 'button' : 'group'}
-          aria-label={
-            message.encoded_audio
-              ? isPlaying
-                ? 'Stop playback'
-                : 'Play audio message'
-              : 'Message'
-          }
+          aria-label={message.encoded_audio ? (isPlaying ? 'Stop playback' : 'Play audio message') : 'Message'}
           sx={{
             cursor: message.encoded_audio ? 'pointer' : 'default',
             outline: 'none',
           }}
         >
-          {message.text && message.text.trim() ? (
+          {message.text?.trim() ? (
             <Typography variant="body1" gutterBottom>
               {message.text}
             </Typography>
           ) : (
-            <ImageIcon
-              style={{ color: '#a9a9a9' }}
-              aria-label="Image message"
-            />
+            <Image style={{ color: '#a9a9a9' }} aria-label="Image message" />
           )}
           {message.encoded_audio && (
             <Box
@@ -82,11 +56,7 @@ function Message({ message }) {
                 position: 'relative',
               }}
             >
-              {isPlaying ? (
-                <StopCircleIcon aria-label="Stop audio" />
-              ) : (
-                <VolumeUpIcon aria-label="Play audio" />
-              )}
+              {isPlaying ? <StopCircle aria-label="Stop audio" /> : <VolumeUp aria-label="Play audio" />}
             </Box>
           )}
         </Box>

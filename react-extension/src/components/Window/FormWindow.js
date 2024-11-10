@@ -3,14 +3,12 @@ import { Button, Box, Typography } from '@mui/material';
 import Window from './Window';
 
 
-function FormWindow({ isOpen, onClose, onSubmit,
-                        title, titleSx, buttonText, buttonSx, sx,
-                        children }) {
+function FormWindow({ isOpen, onClose, onSubmit, title, buttonText, children }) {
 
     return (
-        <Window isOpen={isOpen} onClose={onClose} sx={sx}>
+        <Window isOpen={isOpen} onClose={onClose}>
   
-          <Typography variant='title' sx={titleSx}>
+          <Typography variant='title'>
             {title}
           </Typography>
   
@@ -20,7 +18,7 @@ function FormWindow({ isOpen, onClose, onSubmit,
           >
             {children}
 
-            <Button type='submit' variant='contained' sx={{ mt: 1, ...buttonSx }}>
+            <Button type='submit' variant='contained' sx={{ mt: 1 }}>
                 {buttonText}
               </Button>
           </Box>

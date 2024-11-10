@@ -1,18 +1,23 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log('Background script received message:', request);
+
+  // Capturing the visible tab on the user's browser:
   if (request.action === 'captureScreen') {
-    console.log('Processing captureScreen action...');
     chrome.tabs.captureVisibleTab(null, { format: 'png' }, (dataUrl) => {
+
       if (chrome.runtime.lastError || !dataUrl) {
         console.error('Error capturing tab:', chrome.runtime.lastError?.message);
-        sendResponse({ success: false, error: chrome.runtime.lastError?.message || 'Failed to capture tab' });
+
+        sendResponse(
+          { 
+            success: false, 
+            error: chrome.runtime.lastError?.message || 'Failed to capture tab' 
+          });
         return;
       }
 
       const base64Data = dataUrl.replace(/^data:image\/png;base64,/, '');
-      console.log('Captured Base64 data length:', base64Data.length);
 
-      // Send the captured image data back to the sender
+      // Sending the base64 image data back:
       sendResponse({ success: true, imageData: base64Data });
     });
   }

@@ -8,15 +8,13 @@ import LoginWindow from './LoginWindow';
 function LoginButton({ sx }) {
   const { user } = useUser();
 
-  // Whether the login window is open:
   const [windowOpen, setWindowOpen] = useState(false);
-  const toggleWindow = () => setWindowOpen(!windowOpen);
 
   const handleLoginClick = () => {
     if (user) {
       logout();
     } else {
-      toggleWindow();
+      setWindowOpen(true)    
     }
   };
 
@@ -31,7 +29,7 @@ function LoginButton({ sx }) {
         {user ? 'Log Out' : 'Get Started'}
       </Button>
 
-      <LoginWindow isOpen={windowOpen} onClose={toggleWindow} />
+      <LoginWindow isOpen={windowOpen} onClose={() => setWindowOpen(false)} />
     </Box>
   );
 }

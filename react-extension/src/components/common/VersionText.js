@@ -11,7 +11,6 @@ function VersionText() {
         left: '50%', 
         transform: 'translateX(-50%)',
         mt: 2,
-        mb: 0,
         fontSize: '0.75rem', 
         color: 'grey.500' 
       }}

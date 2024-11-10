@@ -1,5 +1,4 @@
-import { Box, Dialog, DialogActions, DialogContent, IconButton } from '@mui/material';
-import { Cancel } from '@mui/icons-material';
+import { Box, Dialog, DialogContent } from '@mui/material';
 
 
 function Window({ isOpen, onClose, sx, children }){
@@ -17,14 +16,9 @@ function Window({ isOpen, onClose, sx, children }){
         maxWidth={sx?.maxWidth || 'xs'}
         PaperProps={{ sx: { borderRadius: 3 } }}
       >
-        <DialogActions>
-          <IconButton onClick={onClose} sx={{ padding: 0 }}>
-            <Cancel />
-          </IconButton>
-        </DialogActions>
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingX: 2 }}>
-          <DialogContent sx={{ width: '100%', padding: 1 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', px: 2, pt: 3 }}>
+          <DialogContent sx={{ width: '100%', padding: 0 }}>
             {children}
           </DialogContent>
         </Box>

@@ -1,7 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi.middleware import SlowAPIMiddleware
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import PlainTextResponse, JSONResponse
+from fastapi.exceptions import RequestValidationError
 from slowapi.errors import RateLimitExceeded
 from slowapi import _rate_limit_exceeded_handler
 from dotenv import load_dotenv
@@ -44,6 +45,24 @@ app.include_router(assistant.router)
 app.include_router(auth.router)
 app.include_router(users.router)
 
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """
+    Custom exception handler for Pydantic validation errors.
+    """
+    errors = []
+    for error in exc.errors():
+        # Construct a user-friendly field name
+        field = " -> ".join([
+            str(elem).replace('_', ' ').capitalize() for elem in error['loc'] if elem != 'body'
+        ])
+        message = error['msg'].capitalize()
+        errors.append(f"{field}: {message}")
+    friendly_message = "; ".join(errors)
+    return JSONResponse(
+        status_code=422,
+        content={"detail": friendly_message}
+    )
 
 @app.get("/", response_class=PlainTextResponse, include_in_schema=False)
 async def root():

@@ -4,7 +4,7 @@ import { Button, Box, TextField, Typography } from '@mui/material';
 import { useUser } from '../../context/UserContext';
 import { login } from '../../api/auth';
 import { createUser } from '../../api/user';
-import FormWindow from '../common/FormWindow';
+import FormWindow from '../Window/FormWindow';
 
 function LoginWindow({ isOpen, onClose }) {    
 
@@ -34,7 +34,6 @@ function LoginWindow({ isOpen, onClose }) {
 
         if (isSignUp) {
           result = await createUser(name, email, password);
-
         } else {
           result = await login(email, password);
         }
