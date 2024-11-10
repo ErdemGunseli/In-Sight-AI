@@ -56,9 +56,23 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         field = " -> ".join([
             str(elem).replace('_', ' ').capitalize() for elem in error['loc'] if elem != 'body'
         ])
-        message = error['msg'].capitalize()
+        # Customize the error message to remove type information
+        error_code = error['type']
+        message = ""
+        if error_code == "value_error.missing":
+            message = "This field is required."
+        elif error_code.startswith("type_error"):
+            message = "Invalid value."
+        elif error_code == "value_error.any_str.min_length":
+            min_length = error['ctx']['limit_value']
+            message = f"Ensure this value has at least {min_length} characters."
+        elif error_code == "value_error.any_str.max_length":
+            max_length = error['ctx']['limit_value']
+            message = f"Ensure this value has at most {max_length} characters."
+        else:
+            message = error['msg'].capitalize()
         errors.append(f"{field}: {message}")
-    friendly_message = "; ".join(errors)
+    friendly_message = " ".join(errors)
     return JSONResponse(
         status_code=422,
         content={"detail": friendly_message}
