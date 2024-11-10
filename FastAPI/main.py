@@ -58,12 +58,13 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         ])
         # Get the error message and capitalize it
         message = error['msg'].capitalize()
-        # Remove the last word (the type) and preceding space and colon
-        message = re.sub(r'[:]\s+\w+$', '', message)
+        # Remove the last word (the type) and any preceding spaces
+        message = re.sub(r'\s+\w+$', '', message)
         errors.append(f"{field}: {message}")
+    final_message = " ".join(errors)
     return JSONResponse(
         status_code=422,
-        content={"detail": " ".join(errors)}
+        content={"detail": final_message}
     )
 
 @app.get("/", response_class=PlainTextResponse, include_in_schema=False)
