@@ -69,11 +69,9 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         message = message.capitalize()
         
         errors.append(f"{field}: {message}")
-    # Combine all error messages into one string
-    friendly_message = " ".join(errors)
     return JSONResponse(
         status_code=422,
-        content={"detail": friendly_message}
+        content={"detail": ".\n".join(errors)}
     )
 
 @app.get("/", response_class=PlainTextResponse, include_in_schema=False)
