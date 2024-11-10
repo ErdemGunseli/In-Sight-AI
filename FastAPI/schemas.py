@@ -6,9 +6,9 @@ from enums import MessageType
 
 
 class CreateUserRequest(BaseModel):
-    name: str = Field(min_length=2, max_length=100)
-    email: EmailStr = Field(max_length=254)
-    password: str = Field(min_length=6, max_length=100)
+    name: str = Field(min_length=2, max_length=50)
+    email: EmailStr = Field(max_length=200)
+    password: str = Field(min_length=6, max_length=50)
 
 
 class UserResponse(BaseModel):

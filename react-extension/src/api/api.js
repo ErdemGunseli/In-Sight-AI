@@ -39,7 +39,12 @@ async function sendRequest(endpoint, options = {}) {
 
         // If the request has failed, providing an error message:
         if (!response.ok) {
-            const errorMessage = responseObject?.detail || response.statusText || 'An error has occurred, please check your input.';
+            let errorMessage;
+            if (response.status === 429) {
+                errorMessage = 'You are sending too many actions in a short period. Please try again later.';
+            } else {
+                errorMessage = responseObject?.detail || response.statusText || 'An error has occurred, please check your input.';
+            }
             throw new ApiError(errorMessage, response.status);
         }
 
