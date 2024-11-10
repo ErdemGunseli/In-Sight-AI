@@ -1,7 +1,6 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi.middleware import SlowAPIMiddleware
-from fastapi.responses import PlainTextResponse, JSONResponse
 from fastapi.exceptions import RequestValidationError
 from slowapi.errors import RateLimitExceeded
 from slowapi import _rate_limit_exceeded_handler
@@ -16,7 +15,8 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from routers import assistant, auth, users
+from handlers import validation_exception_handler
+from routers import root, assistant, auth, users
 from database import engine
 import models
 
@@ -38,35 +38,15 @@ app.add_middleware(SlowAPIMiddleware)
 # Creating tables if they don't already exist:
 models.Base.metadata.create_all(bind=engine)
 
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+
 # Including routers:
+app.include_router(root.router)
 app.include_router(assistant.router)
 app.include_router(auth.router)
 app.include_router(users.router)
 
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    """
-    Custom exception handler for Pydantic validation errors.
-    """
-    errors = []
-    for error in exc.errors():
-        # Construct a user-friendly field name
-        field = " -> ".join([
-            str(elem).replace('_', ' ').capitalize() for elem in error['loc'] if elem != 'body'
-        ])
-        
-        # Removing the first word from the message, which is the data type:
-        message = ' '.join(error['msg'].split()[1:]).capitalize()
-        
-        errors.append(f"{field} {message}.")
-    return JSONResponse(
-        status_code=422,
-        content={"detail": " ".join(errors)}
-    )
 
-@app.get("/", response_class=PlainTextResponse, include_in_schema=False)
-async def root():
-    return "Welcome to the In-Sight API! You can send requests to this URL. For documentation, please visit https://api.in-sight.ai/docs."
 
 # TODO: Incorporate Video
 # TODO: Incorporate NLP & ML
