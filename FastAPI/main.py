@@ -55,16 +55,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             str(elem).replace('_', ' ').capitalize() for elem in error['loc'] if elem != 'body'
         ])
         
-        # Get the error message
-        message = error['msg']
-        
-        colon_pos = message.find(':')
-        if colon_pos != -1:
-            message = message[:colon_pos]
-        
-        message = message.capitalize()
-        
-        errors.append(message)
+        errors.append(f"{field}")
     return JSONResponse(
         status_code=422,
         content={"detail": ".\n".join(errors)}
