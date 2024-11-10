@@ -1,5 +1,3 @@
-import re
-
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi.middleware import SlowAPIMiddleware
@@ -56,15 +54,26 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         field = " -> ".join([
             str(elem).replace('_', ' ').capitalize() for elem in error['loc'] if elem != 'body'
         ])
-        # Get the error message and capitalize it
-        message = error['msg'].capitalize()
-        # Remove the last word (the type) and any preceding spaces
-        message = re.sub(r'\s+\w+$', '', message)
+        
+        # Get the error message
+        message = error['msg']
+        
+        # Remove ': Type' from the message
+        # Find the position of ': ' if it exists
+        colon_pos = message.find(': ')
+        if colon_pos != -1:
+            # Remove everything from ': ' onwards
+            message = message[:colon_pos]
+        
+        # Capitalize the message
+        message = message.capitalize()
+        
         errors.append(f"{field}: {message}")
-    final_message = " ".join(errors)
+    # Combine all error messages into one string
+    friendly_message = " ".join(errors)
     return JSONResponse(
         status_code=422,
-        content={"detail": final_message}
+        content={"detail": friendly_message}
     )
 
 @app.get("/", response_class=PlainTextResponse, include_in_schema=False)
