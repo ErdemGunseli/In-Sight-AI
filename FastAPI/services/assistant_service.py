@@ -1,9 +1,11 @@
 import os
 import base64
 import requests
+import io
 from io import BytesIO
 from typing import List, Optional
 import time
+import wave
 
 from openai import OpenAI
 from fastapi import UploadFile, HTTPException
@@ -12,16 +14,19 @@ from exceptions import NoMessageException, UnprocessableMessageException, APIReq
 from dependencies import db_dependency, user_dependency
 from models import Message
 from strings import ASSISTANT_CONTEXT
-from enums import MessageType, AIModel
+from enums import MessageType, AIModel, TTSModel
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 import os
 import asyncio
 import websockets
 import json
 
+from pyneuphonic import Neuphonic, TTSConfig
 
 client = OpenAI()
 
+# Initializing the Neuphonic client:
+neuphonic_client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_KEY'))
 
 def get_messages(db: db_dependency, user: user_dependency, limit: int = 20) -> List[Message]:
     start_time = time.time()
@@ -93,13 +98,52 @@ def speech_to_text(audio_bytes: bytes, file_name: str) -> str:
     return result
 
 
-def text_to_speech(text: str) -> bytes: 
+def neuphonic_text_to_speech(text: str) -> str:
+    # Use the Neuphonic client to generate audio from text
+    sse = neuphonic_client.tts.SSEClient()
+    tts_config = TTSConfig()  # Set any desired options here
+    
+    # Send the text and get the response
+    response = sse.send(text, tts_config=tts_config)
+    
+    # Collect the audio data
+    audio_data = b''
+    for item in response:
+        audio_data += item.data.audio
+    
+    # Write the raw audio data into a WAV file in memory
+    wav_buffer = io.BytesIO()
+    with wave.open(wav_buffer, 'wb') as wf:
+        # Set the parameters for the WAV file
+        wf.setnchannels(1)                # Mono audio
+        wf.setsampwidth(2)                # Sample width in bytes (16-bit audio)
+        wf.setframerate(22050)            # Sampling rate in Hertz
+        wf.writeframes(audio_data)
+    
+    # Retrieve the WAV data from the buffer
+    wav_data = wav_buffer.getvalue()
+    
+    # Encode the WAV data to base64
+    encoded_audio = base64.b64encode(wav_data).decode('utf-8')
+
+    return encoded_audio
+
+
+def text_to_speech(text: str) -> str:
     start_time = time.time()
-    result = client.audio.speech.create(model="tts-1", voice="alloy", input=text).content
+    audio_bytes = client.audio.speech.create(
+        model="tts-1",
+        voice="alloy",
+        input=text
+    ).content
     time_taken = time.time() - start_time
 
     print(f"Time taken for text to speech: {time_taken:.4f} seconds")
-    return result
+
+    # Encode the audio bytes to base64
+    encoded_audio = base64.b64encode(audio_bytes).decode("utf-8")
+
+    return encoded_audio
 
 
 def send_completion_request(_: user_dependency, messages: dict, encoded_image: str = None, model: AIModel = AIModel.GPT_4O, max_tokens: int = 300) -> str:
@@ -143,51 +187,70 @@ def send_completion_request(_: user_dependency, messages: dict, encoded_image: s
     return response_text
 
 
-async def completion(db: db_dependency, user: user_dependency, text: Optional[str],
-    audio: Optional[UploadFile], image: Optional[UploadFile], encoded_image: Optional[str] = None,
-    model: AIModel = AIModel.GPT_4O, generate_audio: bool = False, max_tokens: int = 300, context_message_count: int= 20) -> dict: 
+async def completion(
+    db: db_dependency, 
+    user: user_dependency, 
+    text: Optional[str],
+    audio: Optional[UploadFile], 
+    image: Optional[UploadFile], 
+    encoded_image: Optional[str] = None,
+    model: AIModel = AIModel.GPT_4O, 
+    generate_audio: bool = False, 
+    tts_model: TTSModel = TTSModel.OPENAI, 
+    max_tokens: int = 300, 
+    context_message_count: int = 20
+) -> dict:
 
     print("\n\n\n")
     start_time = time.time()
     try:
-        # If at least one type of input is not provided, raising an exception:
+        # If at least one type of input is not provided, raise an exception
         if not any([text, audio, image, encoded_image]):
             raise NoMessageException
 
         transcription = None
         if audio:
-            # Reading the audio and converting to text:
+            # Reading the audio and converting to text
             audio_bytes = await audio.read()
             transcription = speech_to_text(audio_bytes, audio.filename)
             await audio.close()
 
-
         if image and not encoded_image:
-            # Reading and encoding the image file:
+            # Reading and encoding the image file
             image_content = await image.read()
             encoded_image = base64.b64encode(image_content).decode("utf-8")
             await image.close()
 
-        # Concatenating user's text and audio prompts:
+        # Concatenating user's text and audio prompts
         user_text = f"{text or ''} {transcription or ''}".strip()
 
-        # Adding the user's message to the DB:
+        # Adding the user's message to the DB
         add_message(db, user, MessageType.USER, user_text)
 
-        # Getting all the messages associated to that user:
+        # Getting all the messages associated with that user
         messages = get_messages(db, user, context_message_count)
 
-        # Sending the completion request to the API:
-        completion_text = send_completion_request(user, messages, encoded_image, model, max_tokens=max_tokens)
+        # Sending the completion request to the API
+        completion_text = send_completion_request(
+            user, messages, encoded_image, model, max_tokens=max_tokens
+        )
 
         encoded_audio = None
         if generate_audio:
-            # Converting the response text to audio:
-            audio_bytes = text_to_speech(completion_text)
-            encoded_audio = base64.b64encode(audio_bytes).decode("utf-8")
-        
-        # Adding the assistant response to the db:
-        assistant_message = add_message(db, user, MessageType.ASSISTANT, completion_text, encoded_audio)
+            # Determine which TTS function to use based on tts_model
+            if tts_model == TTSModel.OPENAI:
+                # Use the OpenAI TTS function
+                encoded_audio = text_to_speech(completion_text)
+            elif tts_model == TTSModel.NEUPHONIC:
+                # Use the Neuphonic TTS function
+                encoded_audio = neuphonic_text_to_speech(completion_text)
+            else:
+                raise ValueError(f"Unsupported TTS model: {tts_model.value}")
+
+        # Adding the assistant response to the db
+        assistant_message = add_message(
+            db, user, MessageType.ASSISTANT, completion_text, encoded_audio
+        )
 
         time_taken = time.time() - start_time
         print(f"Total time taken for completion (incl image processing, TTS, STT): {time_taken:.4f} seconds")
@@ -195,9 +258,9 @@ async def completion(db: db_dependency, user: user_dependency, text: Optional[st
         return assistant_message
 
     except HTTPException as h:
-        # Raising HTTP Exceptions again without modification:
+        # Raising HTTP Exceptions again without modification
         raise h
-    
+
     except Exception as e:
         print(f"Error during completion: {e}")
         raise UnprocessableMessageException from e
