@@ -104,17 +104,16 @@ def text_to_speech(text: str) -> bytes:
 
 def send_completion_request(_: user_dependency, messages: dict, encoded_image: str = None, model: AIModel = AIModel.GPT_4O, max_tokens: int = 300) -> str:
     # Ensuring the messages are in the correct format for the API:
-    formatted_messages = messages
 
-    print(f"\n\nFormatted Messages:\n{formatted_messages}\n\n")
+    print(f"\n\nFormatted Messages:\n{messages}\n\n")
 
-    if encoded_image is not None: 
+    if encoded_image: 
         # If there is an image, adding it to the user's last message (all past images excluded due to context window limits):
         # There will always be a content field due to the formatting method.
-        formatted_messages[-1]["content"].append({"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{encoded_image}"}})
+        messages[-1]["content"].append({"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{encoded_image}"}})
         
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}"}
-    payload = {"model": model.value, "messages": formatted_messages, "max_tokens": max_tokens}
+    payload = {"model": model.value, "messages": messages, "max_tokens": max_tokens}
 
     # Sending the completion request:
     response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
@@ -138,7 +137,6 @@ def send_completion_request(_: user_dependency, messages: dict, encoded_image: s
 
     # Need to obtain values from dict (rather than attributes) since we are using requests instead of SDK:
     response_message = response_data["choices"][0]["message"]
-    formatted_messages.append(response_message)
 
     response_text = response_message["content"]
 
