@@ -17,7 +17,7 @@ async def completion(db: db_dependency, user: user_dependency, request: Request,
                      text: Optional[str] = Form(None), audio: UploadFile = File(None), 
                      image: UploadFile = File(None), encoded_image: Optional[str] = Form(None),
                      model: AIModel = Form(AIModel.GPT_4O), generate_audio: bool = Form(False),
-                     tts_model: TTSModel = Form(TTSModel.NEUPHONIC)):
+                     tts_model: TTSModel = Form(TTSModel.OPENAI)):
 
     return await assistant_service.completion(db, user, text, audio, image, encoded_image, model, generate_audio, tts_model)
 
