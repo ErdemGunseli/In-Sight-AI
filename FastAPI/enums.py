@@ -15,3 +15,12 @@ class AIModel(Enum):
 class TTSModel(Enum):
     OPENAI = 'openai'
     NEUPHONIC = 'neuphonic'
+
+
+class OpenAIVoice(Enum):
+    ALLOY = 'alloy'
+    ECHO = 'echo'
+    FABLE = 'fable'
+    ONYX = 'onyx'
+    NOVA = 'nova'
+    SHIMMER = 'shimmer'

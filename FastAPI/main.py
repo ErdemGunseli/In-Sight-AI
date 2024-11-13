@@ -48,9 +48,7 @@ app.include_router(users.router)
 
 
 
-# TODO: Incorporate Video
 # TODO: Incorporate NLP & ML
-# TODO: Incorporate RealTime
 # TODO: After RealTime, Endpoint to change voice type, detail length, voice speed
 
 if __name__ == "__main__":

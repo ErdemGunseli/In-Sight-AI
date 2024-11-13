@@ -14,7 +14,7 @@ from exceptions import NoMessageException, UnprocessableMessageException, APIReq
 from dependencies import db_dependency, user_dependency
 from models import Message
 from strings import ASSISTANT_CONTEXT
-from enums import MessageType, AIModel, TTSModel
+from enums import MessageType, AIModel, TTSModel, OpenAIVoice
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 import os
 import asyncio
@@ -129,13 +129,14 @@ def neuphonic_text_to_speech(text: str) -> str:
     return encoded_audio
 
 
-def text_to_speech(text: str) -> str:
+def text_to_speech(text: str, voice: OpenAIVoice = OpenAIVoice.ALLOY) -> str:
     start_time = time.time()
-    audio_bytes = client.audio.speech.create(
+    audio_response = client.audio.speech.create(
         model="tts-1",
-        voice="alloy",
+        voice=voice.value,  # Use the voice value from OpenAIVoice enum
         input=text
-    ).content
+    )
+    audio_bytes = audio_response.content
     time_taken = time.time() - start_time
 
     print(f"Time taken for text to speech: {time_taken:.4f} seconds")
@@ -197,6 +198,7 @@ async def completion(
     model: AIModel = AIModel.GPT_4O, 
     generate_audio: bool = False, 
     tts_model: TTSModel = TTSModel.OPENAI, 
+    openai_voice: OpenAIVoice = OpenAIVoice.ALLOY, 
     max_tokens: int = 300, 
     context_message_count: int = 20
 ) -> dict:
@@ -240,7 +242,7 @@ async def completion(
             # Determine which TTS function to use based on tts_model
             if tts_model == TTSModel.OPENAI:
                 # Use the OpenAI TTS function
-                encoded_audio = text_to_speech(completion_text)
+                encoded_audio = text_to_speech(completion_text, openai_voice)
             elif tts_model == TTSModel.NEUPHONIC:
                 # Use the Neuphonic TTS function
                 encoded_audio = neuphonic_text_to_speech(completion_text)

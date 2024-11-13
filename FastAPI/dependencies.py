@@ -44,7 +44,7 @@ auth_dependency = Annotated[OAuth2PasswordRequestForm, Depends(OAuth2PasswordReq
 token_dependency = Annotated[str, Depends(OAuth2PasswordBearer(tokenUrl="auth/token"))]
 
 
-async def get_current_user(db: db_dependency, token: token_dependency) -> User:
+def get_current_user(db: db_dependency, token: token_dependency) -> User:
     try:
         # Attempting to decode the token using the secret key and algorithm:
         # (If successful, this will return a dictionary that contains the user data.)

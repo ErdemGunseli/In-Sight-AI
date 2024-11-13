@@ -67,7 +67,3 @@ function App() {
 }
 
 export default App;
-
-
-// TODO: Proper error messages from backend
-

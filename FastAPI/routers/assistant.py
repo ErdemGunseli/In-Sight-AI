@@ -4,7 +4,7 @@ from fastapi import APIRouter, status as st, UploadFile, File, Form, Request, We
 from starlette.requests import Request
 
 from rate_limiter import limiter
-from enums import AIModel, TTSModel
+from enums import AIModel, TTSModel, OpenAIVoice
 from services import assistant_service
 from schemas import MessageResponse
 from dependencies import db_dependency, user_dependency
@@ -17,9 +17,9 @@ async def completion(db: db_dependency, user: user_dependency, request: Request,
                      text: Optional[str] = Form(None), audio: UploadFile = File(None), 
                      image: UploadFile = File(None), encoded_image: Optional[str] = Form(None),
                      model: AIModel = Form(AIModel.GPT_4O), generate_audio: bool = Form(False),
-                     tts_model: TTSModel = Form(TTSModel.OPENAI)):
+                     tts_model: TTSModel = Form(TTSModel.OPENAI), openai_voice: OpenAIVoice = Form(OpenAIVoice.ALLOY)):
 
-    return await assistant_service.completion(db, user, text, audio, image, encoded_image, model, generate_audio, tts_model)
+    return await assistant_service.completion(db, user, text, audio, image, encoded_image, model, generate_audio, tts_model, openai_voice)
 
 @router.get("/messages", response_model=List[MessageResponse], status_code=st.HTTP_200_OK)
 @limiter.limit("10/minute")
