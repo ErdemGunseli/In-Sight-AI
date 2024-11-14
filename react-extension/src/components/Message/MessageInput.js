@@ -44,10 +44,9 @@ function MessageInput() {
 
     try {
       const { imageData: encodedImage } = await captureScreen();
-      const generateAudio = !isMuted;
-
+  
       const compressedImageData = await resizeBase64Image(encodedImage);
-      const result = await completion(textInput, compressedImageData, generateAudio);
+      const result = await completion(textInput, compressedImageData, !isMuted);
 
       const assistantMessage = {
         id: result.id,

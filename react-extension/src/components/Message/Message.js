@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, Paper } from '@mui/material';
 import { VolumeUp, StopCircle, Image } from '@mui/icons-material';
-import useAudioPlayer from '../../hooks/useAudioPlayer';
+import { useAudioPlayer } from '../../context/AudioPlayerContext';
 
 function Message({ message }) {
   const isUser = message.type === 'user';
@@ -34,7 +34,13 @@ function Message({ message }) {
           onKeyDown={handleKeyDown}
           tabIndex={message.encoded_audio ? 0 : -1}
           role={message.encoded_audio ? 'button' : 'group'}
-          aria-label={message.encoded_audio ? (isPlaying ? 'Stop playback' : 'Play audio message') : 'Message'}
+          aria-label={
+            message.encoded_audio
+              ? isPlaying
+                ? 'Stop playback'
+                : 'Play audio message'
+              : 'Message'
+          }
           sx={{
             cursor: message.encoded_audio ? 'pointer' : 'default',
             outline: 'none',
@@ -56,7 +62,11 @@ function Message({ message }) {
                 position: 'relative',
               }}
             >
-              {isPlaying ? <StopCircle aria-label="Stop audio" /> : <VolumeUp aria-label="Play audio" />}
+              {isPlaying ? (
+                <StopCircle aria-label="Stop audio" />
+              ) : (
+                <VolumeUp aria-label="Play audio" />
+              )}
             </Box>
           )}
         </Box>

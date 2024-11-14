@@ -47,10 +47,10 @@ token_dependency = Annotated[str, Depends(OAuth2PasswordBearer(tokenUrl="auth/to
 def get_current_user(db: db_dependency, token: token_dependency) -> User:
     try:
         # Attempting to decode the token using the secret key and algorithm:
-        # (If successful, this will return a dictionary that contains the user data.)
+        # (If successful, this will return a dictionary that contains the user data)
         payload = jwt.decode(token, HASH_SECRET_KEY, algorithms=[HASH_ALGORITHM])
 
-        # Extracting the user id from the payload dictionary:
+        # Extracting the user ID from the payload dictionary:
         # The subject of a JWT needs to be a string, so converting back to integer:
         user_id: Optional[int] = payload.get("sub")
 

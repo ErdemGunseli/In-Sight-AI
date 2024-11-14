@@ -1,4 +1,5 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useContext } from 'react';
+import { getVoiceSpeed } from '../api/assistant';
 
 const AudioPlayerContext = createContext();
 
@@ -13,6 +14,13 @@ export const AudioPlayerProvider = ({ children }) => {
     }
 
     const newAudioInstance = new Audio(`data:audio/wav;base64,${encodedAudio}`);
+
+    // Getting the saved voice speed (default 1 if not set):
+    const voiceSpeed = parseFloat(getVoiceSpeed()) || 1;
+
+    // Setting the playback rate:
+    newAudioInstance.playbackRate = voiceSpeed;
+
     setAudioInstance(newAudioInstance);
     setPlayingMessageId(messageId);
 
@@ -49,6 +57,21 @@ export const AudioPlayerProvider = ({ children }) => {
       {children}
     </AudioPlayerContext.Provider>
   );
+};
+
+// Custom hook to simplify usage:
+export const useAudioPlayer = (encodedAudio, messageId) => {
+  const { isPlaying, playingMessageId, toggleAudio } = useContext(AudioPlayerContext);
+
+  const isMessagePlaying = isPlaying && playingMessageId === messageId;
+
+  const handleToggleAudio = () => {
+    if (encodedAudio && messageId !== undefined) {
+      toggleAudio(encodedAudio, messageId);
+    }
+  };
+
+  return { isPlaying: isMessagePlaying, toggleAudio: handleToggleAudio };
 };
 
 export default AudioPlayerContext; 

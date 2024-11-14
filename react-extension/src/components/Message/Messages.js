@@ -15,7 +15,7 @@ function Messages() {
         if (user) {
             refreshMessages();
         }
-        // Including refreshMessages as dependency causes infinite re-render - use useCallback 
+        // Including refreshMessages as dependency causes infinite re-render - useCallback
     }, [user]);
 
     useEffect(() => {

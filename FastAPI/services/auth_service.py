@@ -6,7 +6,7 @@ from security import bcrypt_context, create_access_token
 
 def authenticate_user(db: db_dependency, email: str, password: str) -> User:
     # Searching for a user with the given email in lowercase:
-    user = db.query(User).filter_by(email=email.lower()).first()  # Convert email to lowercase
+    user = db.query(User).filter_by(email=email.lower()).first()
 
     if user is None: raise UserNotFoundException
     elif not bcrypt_context.verify(password, user.password): raise InvalidCredentialsException

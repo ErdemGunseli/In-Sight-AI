@@ -49,7 +49,7 @@ export const MessageProvider = ({ children }) => {
 
 export default MessageContext;
 
-// Custom hook to simplify usage
+// Custom hook to simplify usage:
 export const useMessages = () => {
   return useContext(MessageContext);
 };

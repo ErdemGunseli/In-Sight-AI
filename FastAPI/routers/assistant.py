@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from fastapi import APIRouter, status as st, UploadFile, File, Form, Request, WebSocket
+from fastapi import APIRouter, status as st, UploadFile, File, Form, Request
 from starlette.requests import Request
 
 from rate_limiter import limiter
@@ -12,7 +12,7 @@ from dependencies import db_dependency, user_dependency
 router = APIRouter(prefix="/assistant", tags=["Assistant"])
 
 @router.post("/completion", response_model=MessageResponse, status_code=st.HTTP_201_CREATED)
-@limiter.limit("5/minute, 20/month")
+@limiter.limit("5/minute")
 async def completion(db: db_dependency, user: user_dependency, request: Request,
                      text: Optional[str] = Form(None), audio: UploadFile = File(None), 
                      image: UploadFile = File(None), encoded_image: Optional[str] = Form(None),

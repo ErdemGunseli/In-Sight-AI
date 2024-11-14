@@ -22,7 +22,7 @@ import models
 
 from rate_limiter import limiter
 
-# Adding CORS middleware before other middlewares
+# Adding CORS middleware before other middleware:
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -46,10 +46,6 @@ app.include_router(assistant.router)
 app.include_router(auth.router)
 app.include_router(users.router)
 
-
-
-# TODO: Incorporate NLP & ML
-# TODO: After RealTime, Endpoint to change voice type, detail length, voice speed
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
