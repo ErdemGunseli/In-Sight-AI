@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, Paper, IconButton, Collapse } from '@mui/material';
+import { Box, Typography, Paper, IconButton } from '@mui/material';
 import { VolumeUp, StopCircle, Image as ImageIcon } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 
@@ -17,14 +17,12 @@ function Message({ message }) {
     const handleClick = () => message.encoded_audio && toggleAudio();
 
     const handleFeedback = async (feedback) => {
-      await updateMessageFeedback(message.id, feedback);
-      setFeedback(feedback);
-      toast.success('Descriptions will be improved.');
+        await updateMessageFeedback(message.id, feedback);
+        setFeedback(feedback);
+        toast.success('Descriptions will be improved.');
     };
 
     const showFeedback = message.type === 'assistant' && feedback === 'neutral';
-
-    console.log(message);
 
     return (
         <Box
@@ -42,7 +40,6 @@ function Message({ message }) {
                     maxWidth: '80%',
                     textAlign: isUser ? 'right' : 'left',
                     padding: '8px',
-                    transition: 'height 0.5s ease',
                     overflow: 'hidden',
                 }}
             >
@@ -81,62 +78,58 @@ function Message({ message }) {
                     )}
                 </Box>
 
-                <Collapse
-                    in={showFeedback}
-                    timeout={500}
-                    unmountOnExit
-                    sx={{ marginTop: '6px' }}
+                <Box
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        marginTop: '6px',
+                    }}
                 >
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                        }}
-                    >
-                        <IconButton
-                            onClick={() => handleFeedback('positive')}
-                            aria-label="Thumbs up"
-                            size="medium"
-                            sx={{ color: 'lightgray', padding: '6px' }}
-                        >
-                            <ThumbUpOutlinedIcon fontSize="small" />
-                        </IconButton>
-                        <IconButton
-                            onClick={() => handleFeedback('negative')}
-                            aria-label="Thumbs down"
-                            size="medium"
-                            sx={{ color: 'lightgray', padding: '6px' }}
-                        >
-                            <ThumbDownOutlinedIcon fontSize="small" />
-                        </IconButton>
-
-                        <Box sx={{ flexGrow: 1 }} />
-
-                        {message.encoded_audio && (
+                    {showFeedback && (
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             <IconButton
-                                aria-label={
-                                    isPlaying ? 'Stop audio' : 'Play audio'
-                                }
-                                onClick={handleClick}
+                                onClick={() => handleFeedback('positive')}
+                                aria-label="Thumbs up"
                                 size="medium"
-                                sx={{ color: 'white', padding: '6px' }}
+                                sx={{ color: 'lightgray', padding: '6px' }}
                             >
-                                {isPlaying ? (
-                                    <StopCircle
-                                        aria-label="Stop audio"
-                                        fontSize="medium"
-                                    />
-                                ) : (
-                                    <VolumeUp
-                                        aria-label="Play audio"
-                                        fontSize="medium"
-                                    />
-                                )}
+                                <ThumbUpOutlinedIcon fontSize="small" />
                             </IconButton>
-                        )}
-                    </Box>
-                </Collapse>
+                            <IconButton
+                                onClick={() => handleFeedback('negative')}
+                                aria-label="Thumbs down"
+                                size="medium"
+                                sx={{ color: 'lightgray', padding: '6px' }}
+                            >
+                                <ThumbDownOutlinedIcon fontSize="small" />
+                            </IconButton>
+                        </Box>
+                    )}
 
+                    {/* Spacer to push the audio icon to the right */}
+                    <Box sx={{ flexGrow: 1 }} />
+
+                    {message.encoded_audio && (
+                        <IconButton
+                            aria-label={isPlaying ? 'Stop audio' : 'Play audio'}
+                            onClick={handleClick}
+                            size="medium"
+                            sx={{ color: 'white', padding: '6px' }}
+                        >
+                            {isPlaying ? (
+                                <StopCircle
+                                    aria-label="Stop audio"
+                                    fontSize="medium"
+                                />
+                            ) : (
+                                <VolumeUp
+                                    aria-label="Play audio"
+                                    fontSize="medium"
+                                />
+                            )}
+                        </IconButton>
+                    )}
+                </Box>
             </Paper>
         </Box>
     );
