@@ -4,18 +4,18 @@ import requests
 import io
 from io import BytesIO
 from typing import List, Optional
-import time
 import wave
 
 from openai import OpenAI
 from fastapi import UploadFile, HTTPException
 from pyneuphonic import Neuphonic, TTSConfig
 
-from exceptions import NoMessageException, UnprocessableMessageException, APIRequestException
+from services.ml_services.keyword_extraction import score_categories
+from exceptions import NoMessageException, UnprocessableMessageException, APIRequestException, MessageNotFoundException
 from dependencies import db_dependency, user_dependency
-from models import Message
+from models import Message, MessageInsight
 from strings import ASSISTANT_CONTEXT
-from enums import MessageType, AIModel, TTSModel, OpenAIVoice
+from enums import MessageType, AIModel, TTSModel, OpenAIVoice, MessageFeedback
 
 client = OpenAI()
 
@@ -35,15 +35,20 @@ def get_user_messages(db: db_dependency, user: user_dependency, limit: int = 20)
     return result
 
 
+def format_message(message: List[Message], user: user_dependency):
+    if message.type == MessageType.USER: text = f"{user.name}'s Prompt: {message.text}"
+    else: text = message.text
+    
+    return {"role": message.type.value, "content": [{"type": "text", "text": text}]}
+
+
 def format_messages(messages: List[Message], user: user_dependency) -> List[str]:
     # Need to use the string value of the enum to avoid issues with JSON serialization:
     formatted_messages = []
-    for message in messages:
-        if message.type == MessageType.USER: text = f"{user.name}'s Prompt: {message.text}"
-        else: text = message.text
 
-        formatted_messages.append({"role": message.type.value, "content": [{"type": "text", "text": text}]})
-    
+    for message in messages:
+        formatted_messages.append(format_message(message, user))
+
     return formatted_messages
 
 
@@ -53,8 +58,26 @@ def add_message(db: db_dependency, user: user_dependency, type: MessageType, tex
     db.commit()
     db.refresh(new_message)
 
+    # Scoring the message:
+    scores = score_categories(text)
+    for category, score in scores.items():
+        db.add(MessageInsight(message_id=new_message.id, category=category, score=score))
+    db.commit()
+
     return new_message
 
+
+def add_message_feedback(db: db_dependency, user, message_id: int, feedback: MessageFeedback) -> None:
+    # Retrieving the message from the database:
+    message = db.query(Message).filter_by(id=message_id, user_id=user.id, type=MessageType.ASSISTANT).first()
+
+    # Checking if the message exists:
+    if not message:
+        raise MessageNotFoundException
+
+    # Updating the message feedback:
+    message.feedback = feedback
+    db.commit()
 
 def delete_messages(db: db_dependency, user: user_dependency) -> None:
     messages = db.query(Message).filter((Message.user_id == user.id) & ((Message.type == MessageType.USER) | (Message.type == MessageType.ASSISTANT))).all()
@@ -173,11 +196,16 @@ async def completion(db: db_dependency, user: user_dependency, text: Optional[st
         # Concatenating user's text and audio prompt:
         user_text = f"{text or ''} {transcription or ''}".strip()
 
-        # Adding the user's message to the DB
-        add_message(db, user, MessageType.USER, user_text)
+        # Adding the user's message to the DB:
+        if user_text:
+            add_message(db, user, MessageType.USER, user_text)
 
         # Getting all the messages associated with the user:
         messages = get_messages(db, user, context_message_count)
+
+        # User message object needed to attach image:
+        if not user_text:
+            messages.append(format_message(Message(type=MessageType.USER, text=user_text), user))
 
         # Sending the completion request:
         completion_text = send_completion_request(user, messages, encoded_image, model, max_tokens=max_tokens)

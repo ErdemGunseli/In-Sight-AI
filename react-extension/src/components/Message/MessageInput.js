@@ -2,13 +2,13 @@ import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Box, IconButton, TextField, InputAdornment, CircularProgress } from '@mui/material';
 import { VolumeOff, VolumeUp, AutoFixHigh, GraphicEq } from '@mui/icons-material';
 
-import { completion } from '../../api/assistant';
+import { completion, saveAudioSetting, getAudioSetting } from '../../api/assistant';
 import { useMessages } from '../../context/MessageContext';
 import AudioPlayerContext from '../../context/AudioPlayerContext';
 import { resizeBase64Image } from '../../utils/imageUtils';
 
 function MessageInput() {
-  const [isMuted, setMuted] = useState(true);
+  const [isMuted, setMuted] = useState(getAudioSetting());
   const [loading, setLoading] = useState(false);
   const [textInput, setTextInput] = useState('');
 
@@ -21,7 +21,13 @@ function MessageInput() {
     textInputRef.current?.focus();
   }, []);
 
-  const toggleMute = () => setMuted(!isMuted);
+  const toggleMute = () => {
+    setMuted((prevIsMuted) => {
+      const newIsMuted = !prevIsMuted;
+      saveAudioSetting(newIsMuted);
+      return newIsMuted;
+    });
+  };
 
   const captureScreen = () =>
     new Promise((resolve, reject) => {
@@ -46,19 +52,12 @@ function MessageInput() {
       const { imageData: encodedImage } = await captureScreen();
   
       const compressedImageData = await resizeBase64Image(encodedImage);
-      const result = await completion(textInput, compressedImageData, !isMuted);
-
-      const assistantMessage = {
-        id: result.id,
-        type: 'assistant',
-        text: result.text,
-        encoded_audio: result.encoded_audio
-      };
+      const assistantMessage = await completion(textInput, compressedImageData, !isMuted);
 
       addMessage(assistantMessage);
 
-      if (result.encoded_audio && !isMuted) {
-        toggleAudio(result.encoded_audio, result.id);
+      if (assistantMessage.encoded_audio && !isMuted) {
+        toggleAudio(assistantMessage.encoded_audio, assistantMessage.id);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -92,40 +91,38 @@ function MessageInput() {
         onKeyDown={handleKeyDown}
         inputRef={textInputRef}
         sx={{ flexGrow: 1, ml: 2 }}
-        slotProps={{
-          input: {
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  onClick={toggleMute}
-                  aria-label={isMuted ? 'Turn On Audio' : 'Turn Off Audio'}
-                >
-                  {isMuted ? <VolumeOff /> : <VolumeUp />}
-                </IconButton>
-                <IconButton
-                  onClick={handleSendMessage}
-                  sx={{
-                    borderRadius: '50%',
-                    backgroundImage:
-                      'linear-gradient(135deg, #6a5acd 0%, #1976d2 20%, #1976d2 80%, #6a5acd 100%)',
-                    color: '#ffffff',
-                  }}
-                  disabled={loading}
-                  aria-label="Send Message"
-                >
-                  {loading ? (
-                    <CircularProgress
-                      size={24}
-                      sx={{ color: '#ffffff' }}
-                      aria-label="Sending..."
-                    />
-                  ) : (
-                    <AutoFixHigh />
-                  )}
-                </IconButton>
-              </InputAdornment>
-            ),
-          },
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton
+                onClick={toggleMute}
+                aria-label={isMuted ? 'Turn On Audio' : 'Turn Off Audio'}
+              >
+                {isMuted ? <VolumeOff /> : <VolumeUp />}
+              </IconButton>
+              <IconButton
+                onClick={handleSendMessage}
+                sx={{
+                  borderRadius: '50%',
+                  backgroundImage:
+                    'linear-gradient(135deg, #6a5acd 0%, #1976d2 20%, #1976d2 80%, #6a5acd 100%)',
+                  color: '#ffffff',
+                }}
+                disabled={loading}
+                aria-label="Send Message"
+              >
+                {loading ? (
+                  <CircularProgress
+                    size={24}
+                    sx={{ color: '#ffffff' }}
+                    aria-label="Sending..."
+                  />
+                ) : (
+                  <AutoFixHigh />
+                )}
+              </IconButton>
+            </InputAdornment>
+          ),
         }}
       />
       <Box display="flex" alignItems="center">

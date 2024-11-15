@@ -2,13 +2,11 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 
-
 import Messages from './components/Message/Messages';
 import Header from './components/common/Header';
 import MessageInput from './components/Message/MessageInput';
 import VersionText from './components/common/VersionText';
 import Welcome from './components/common/Welcome';
-
 import { useUser } from './context/UserContext';
 
 function App() {

@@ -15,7 +15,8 @@
     "service_worker": "background.js"
   },
   "permissions": [
-    "tabs"
+    "tabs",
+    "activeTab"
   ],
   "icons": {
     "16": "assets/logo16.png",

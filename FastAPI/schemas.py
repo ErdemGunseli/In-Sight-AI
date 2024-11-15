@@ -2,7 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field, EmailStr
 
-from enums import MessageType
+from enums import MessageType, MessageFeedback
 
 
 class CreateUserRequest(BaseModel):
@@ -30,5 +30,6 @@ class MessageResponse(BaseModel):
     type: MessageType = Field()
     text: Optional[str] = Field(None)
     encoded_audio: Optional[str] = Field(None)
+    feedback: MessageFeedback = Field()
 
     class Config: from_attributes = True

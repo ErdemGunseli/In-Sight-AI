@@ -1,7 +1,8 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
+
 import './index.css';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import App from './App';
@@ -12,19 +13,24 @@ import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import theme from './themes/theme';
 
-ReactDOM.render(
+const root = createRoot(document.getElementById('root'));
+
+root.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <UserProvider>
         <MessageProvider>
           <AudioPlayerProvider>
-            <ToastContainer 
-              position='top-left'
-              autoClose={2500}
+            <ToastContainer
+              position="top-center"
+              autoClose={2000}
+              closeOnClick
+              pauseOnFocusLoss
+              draggable
               pauseOnHover
-              style={{ zIndex: 9999 }}
-              bodyStyle={{ fontSize: '1rem' }}
+              theme="colored"
+              transition={Slide}
             />
             <App />
           </AudioPlayerProvider>
@@ -32,5 +38,4 @@ ReactDOM.render(
       </UserProvider>
     </ThemeProvider>
   </React.StrictMode>,
-  document.getElementById('root')
 );

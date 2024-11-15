@@ -2,7 +2,7 @@ from fastapi import HTTPException, status as st
 
 
 class UserNotFoundException(HTTPException):
-    def __init__(self, detail="User not found. Please create an account first."):
+    def __init__(self, detail="User not found. Please create an account."):
         super().__init__(status_code=st.HTTP_404_NOT_FOUND, detail=detail)
 
 
@@ -33,6 +33,11 @@ class UnprocessableMessageException(HTTPException):
 
 class APIRequestException(HTTPException):
     def __init__(self, detail="Something went wrong while processing your request. Please try again later."):
-        super().__init__(status_code=500, detail=detail)
+        super().__init__(status_code=st.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail)
+
+
+class MessageNotFoundException(HTTPException):
+    def __init__(self, detail="The specified message was not found."):
+        super().__init__(status_code=st.HTTP_404_NOT_FOUND, detail=detail)
 
 

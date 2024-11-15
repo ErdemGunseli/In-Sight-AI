@@ -7,6 +7,22 @@ class MessageType(Enum):
     ASSISTANT = "assistant"
 
 
+class DescriptionCategory(Enum):
+    SCENE = "scene"
+    ACTIVITY = "activity"
+    EMOTION = "emotion"
+    ATMOSPHERE = "atmosphere"
+    COLOR = "color"
+    TEXT = "text"
+    CONCISENESS = "conciseness"
+
+
+class MessageFeedback(Enum):
+    POSITIVE = "positive"
+    NEGATIVE = "negative"
+    NEUTRAL = "neutral"
+    
+
 class AIModel(Enum):
     GPT_4O = "gpt-4o"
     GPT_4O_MINI = "gpt-4o-mini"

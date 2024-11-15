@@ -16,7 +16,7 @@ export const AudioPlayerProvider = ({ children }) => {
     const newAudioInstance = new Audio(`data:audio/wav;base64,${encodedAudio}`);
 
     // Getting the saved voice speed (default 1 if not set):
-    const voiceSpeed = parseFloat(getVoiceSpeed()) || 1;
+    const voiceSpeed = getVoiceSpeed();
 
     // Setting the playback rate:
     newAudioInstance.playbackRate = voiceSpeed;

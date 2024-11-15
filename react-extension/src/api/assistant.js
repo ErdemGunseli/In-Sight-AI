@@ -1,6 +1,5 @@
 import sendRequest from './api';
 
-// Add functions to save and get the voice setting
 export function saveVoiceSetting(voice) {
     localStorage.setItem('voiceSetting', voice);
 }
@@ -9,13 +8,21 @@ export function getVoiceSetting() {
     return localStorage.getItem('voiceSetting');
 }
 
-// Add functions to save and get the voice speed
 export function saveVoiceSpeed(speed) {
     localStorage.setItem('voiceSpeed', speed);
 }
 
 export function getVoiceSpeed() {
-    return localStorage.getItem('voiceSpeed');
+    const voiceSpeed = localStorage.getItem('voiceSpeed');
+    return parseFloat(voiceSpeed) || 1;
+}
+
+export function saveAudioSetting(isAudioOn) {
+    localStorage.setItem('audioSetting', isAudioOn);
+}
+
+export function getAudioSetting() {
+    return localStorage.getItem('audioSetting') === 'true';
 }
 
 export async function getMessages() {
@@ -33,10 +40,10 @@ export async function completion(text, encodedImage = null, generateAudio = fals
     }
     formData.append('generate_audio', generateAudio);
 
-    // Get the saved voice setting
+    // Getting the saved voice setting:
     const voiceSetting = getVoiceSetting();
 
-    // If voice setting exists, include it in the form data
+    // If voice setting exists, including it in the form data:
     if (voiceSetting) {
         formData.append('openai_voice', voiceSetting);
     }
@@ -49,4 +56,12 @@ export async function completion(text, encodedImage = null, generateAudio = fals
 
 export async function deleteMessages() {
     return await sendRequest('/assistant/messages', { method: 'DELETE' });
+}
+
+export async function updateMessageFeedback(messageId, feedback) {
+    const url = `/assistant/messages/${messageId}/feedback?feedback=${feedback}`;
+
+    return await sendRequest(url, {
+        method: 'PUT',
+    });
 }

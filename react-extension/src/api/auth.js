@@ -26,5 +26,5 @@ export function logout() {
 
 export function userLoggedIn() {
     return !!localStorage.getItem('accessToken');
-  }
+}
   
