@@ -10,7 +10,7 @@ from openai import OpenAI
 from fastapi import UploadFile, HTTPException
 from pyneuphonic import Neuphonic, TTSConfig
 
-from services.ml_services.keyword_extraction import score_categories
+from services.ml_services.keyword_extraction import KeywordExtractor
 from exceptions import NoMessageException, UnprocessableMessageException, APIRequestException, MessageNotFoundException
 from dependencies import db_dependency, user_dependency
 from models import Message, MessageInsight
@@ -21,6 +21,10 @@ client = OpenAI()
 
 # Initializing the Neuphonic client:
 neuphonic_client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_KEY'))
+
+# Initializing the nlp extractor:
+keyword_extractor = KeywordExtractor()
+
 
 def get_messages(db: db_dependency, user: user_dependency, limit: int = 20) -> List[Message]:
     user_messages = get_user_messages(db, user, limit)
@@ -59,7 +63,7 @@ def add_message(db: db_dependency, user: user_dependency, type: MessageType, tex
     db.refresh(new_message)
 
     # Scoring the message:
-    scores = score_categories(text)
+    scores = keyword_extractor.score_categories(text)
     for category, score in scores.items():
         db.add(MessageInsight(message_id=new_message.id, category=category, score=score))
     db.commit()
