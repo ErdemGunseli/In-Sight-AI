@@ -23,7 +23,7 @@ client = OpenAI()
 neuphonic_client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_KEY'))
 
 # Initializing the nlp extractor:
-keyword_extractor = KeywordExtractor()
+# keyword_extractor = KeywordExtractor()
 
 
 def get_messages(db: db_dependency, user: user_dependency, limit: int = 20) -> List[Message]:
@@ -63,10 +63,10 @@ def add_message(db: db_dependency, user: user_dependency, type: MessageType, tex
     db.refresh(new_message)
 
     # Scoring the message:
-    scores = keyword_extractor.score_categories(text)
-    for category, score in scores.items():
-        db.add(MessageInsight(message_id=new_message.id, category=category, score=score))
-    db.commit()
+    # scores = keyword_extractor.score_categories(text)
+    # for category, score in scores.items():
+    #     db.add(MessageInsight(message_id=new_message.id, category=category, score=score))
+    # db.commit()
 
     return new_message
 

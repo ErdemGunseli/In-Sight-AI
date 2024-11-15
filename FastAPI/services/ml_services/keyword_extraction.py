@@ -1,5 +1,5 @@
 import threading
-from typing import Dict, List
+from typing import Dict
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer
