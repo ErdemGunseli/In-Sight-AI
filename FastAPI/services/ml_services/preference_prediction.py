@@ -1,60 +1,89 @@
-# machine_learning/preference_prediction.py
-
+# Random Forest Regressor is a ML model used for regression tasks:
+from sklearn.ensemble import RandomForestRegressor
 from sqlalchemy.orm import Session
-from models import User, Message, UserPreference
-from dependencies import get_db
-from typing import Dict
 import numpy as np
+import pickle
+from apscheduler.schedulers.background import BackgroundScheduler
 
-def update_user_preferences(db: Session, user_id: int, category_scores: Dict[str, float], feedback_positive: bool):
+from models import User, UserInsight, Message, MessageInsight, MessageFeedback
+from enums import MessageType
 
-    # Fetch or create UserPreference
-    user_pref = db.query(UserPreference).filter(UserPreference.user_id == user_id).first()
-    if not user_pref:
-        user_pref = UserPreference(user_id=user_id)
-        db.add(user_pref)
-    
-    # Adjust preferences based on feedback
-    adjustment = 1.0 if feedback_positive else -1.0
-    for category, score in category_scores.items():
-        current_pref = getattr(user_pref, category)
-        # Apply a weighted adjustment based on the score
-        new_pref = current_pref + (0.1 * adjustment * score)
-        # Ensure preferences stay within a reasonable range
-        new_pref = max(0.5, min(new_pref, 2.0))
-        setattr(user_pref, category, new_pref)
-    
-    db.commit()
+MODEL_PATH = 'preference_model.pkl'
 
-def predict_preferences(user_id: int, db: Session) -> Dict[str, float]:
+# Initialize the scheduler
+scheduler = BackgroundScheduler()
+
+def prepare_training_data(db: Session):
     """
-    Retrieves the user's preference profile from the database.
-
-    Args:
-        user_id (int): The ID of the user.
-        db (Session): The database session.
-
-    Returns:
-        Dict[str, float]: A dictionary of user preferences.
+    Prepares training data for preference prediction.
+    Separately processes user and assistant messages based on their purposes.
     """
-    user_pref = db.query(UserPreference).filter(UserPreference.user_id == user_id).first()
-    if not user_pref:
-        # Return default preferences if none exist
-        return {
-            "scene": 1.0,
-            "activities": 1.0,
-            "emotions": 1.0,
-            "atmosphere": 1.0,
-            "colors": 1.0,
-            "text": 1.0,
-            "conciseness": 1.0
-        }
-    return {
-        "scene": user_pref.scene,
-        "activities": user_pref.activities,
-        "emotions": user_pref.emotions,
-        "atmosphere": user_pref.atmosphere,
-        "colors": user_pref.colors,
-        "text": user_pref.text,
-        "conciseness": user_pref.conciseness
-    }
+    users = db.query(User).all()
+    training_data = []
+    labels = []
+
+    for user in users:
+        user_insights = db.query(UserInsight).filter_by(user_id=user.id).all()
+        insights_dict = {insight.category.name: insight.score for insight in user_insights}
+
+        # Process messages
+        messages = db.query(Message).filter_by(user_id=user.id).all()
+        for message in messages:
+            message_insights = db.query(MessageInsight).filter_by(message_id=message.id).all()
+            if message.type == MessageType.USER:
+                # Use user message category values directly as features
+                feature_vector = [insight.score for insight in message_insights]
+                training_data.append(feature_vector)
+
+                # Target labels are user insights
+                label_vector = [insights_dict.get(insight.category.name, 1.0) for insight in message_insights]
+                labels.append(label_vector)
+
+            elif message.type == MessageType.ASSISTANT and message.feedback != MessageFeedback.NEUTRAL:
+                # Use assistant message category values + feedback
+                feature_vector = [insight.score for insight in message_insights]
+                feature_vector.append(1 if message.feedback == MessageFeedback.POSITIVE else -1)
+                training_data.append(feature_vector)
+
+                # Target labels are user insights, adjusted by feedback
+                label_vector = [insights_dict.get(insight.category.name, 1.0) for insight in message_insights]
+                labels.append(label_vector)
+
+    return np.array(training_data), np.array(labels)
+
+
+def train_preference_model(db: Session):
+    """
+    Trains a preference prediction model and saves it to disk.
+    """
+    # Prepare the training data and labels
+    training_data, labels = prepare_training_data(db)
+
+    # Check if there is enough data to train the model
+    if training_data.size == 0 or labels.size == 0:
+        print("Not enough data to train the model.")
+        return
+
+    # Initialize the Random Forest Regressor
+    # n_estimators=100: The number of trees in the forest
+    # random_state=42: Ensures reproducibility of results
+    model = RandomForestRegressor(n_estimators=100, random_state=42)
+
+    # Fit the model to the training data
+    # training_data: Features for training
+    # labels: Target values for training
+    model.fit(training_data, labels)
+
+    # Save the trained model to a file using pickle
+    with open(MODEL_PATH, 'wb') as f:
+        pickle.dump(model, f)
+    print("Model trained and saved successfully.")
+
+def schedule_model_training(db_session):
+    """
+    Schedules the model training to run every day.
+    """
+    # Schedule the train_preference_model function to run every day
+    # args=[db_session]: Pass the database session as an argument to the function
+    scheduler.add_job(train_preference_model, 'interval', days=1, args=[db_session])
+    scheduler.start()

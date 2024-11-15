@@ -24,6 +24,8 @@ function Message({ message }) {
 
     const showFeedback = message.type === 'assistant' && feedback === 'neutral';
 
+    console.log(message);
+
     return (
         <Box
             component="div"
