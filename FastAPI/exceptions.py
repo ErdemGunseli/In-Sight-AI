@@ -2,7 +2,7 @@ from fastapi import HTTPException, status as st
 
 
 class UserNotFoundException(HTTPException):
-    def __init__(self, detail="User not found. Please create an account."):
+    def __init__(self, detail="Please log in with a valid account."):
         super().__init__(status_code=st.HTTP_404_NOT_FOUND, detail=detail)
 
 

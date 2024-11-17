@@ -25,3 +25,16 @@ For example, describe people or objects based on context
 (e.g., “a family enjoying a meal” rather than “a group eating something” if it seems clear from the scene). 
 This helps avoid vague or hesitant language that could be confusing or frustrating to the user.
 """
+
+def get_dynamic_prompt(user=None):
+    result = ASSISTANT_CONTEXT
+
+    if not user: return result
+    
+    category_scores = {insight.category.name: insight.score for insight in user.insights}
+
+    result += "\nRoughly the following percentages of your response should focus on the following categories:"
+    for category_name, score in category_scores.items():
+        result += f"\n{category_name} - {score * 100:.2f}%"
+
+    return result

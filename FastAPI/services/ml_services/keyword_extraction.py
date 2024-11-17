@@ -1,13 +1,22 @@
+import os
+import sys
 import threading
 from typing import Dict
+
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer
 
+# Adding parent directory so enums import works when running standalone file (for testing):
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(os.path.dirname(current_dir))
+sys.path.insert(0, parent_dir)
+
 from enums import DescriptionCategory
 
+
 class KeywordExtractor:
-    # Thread-safe class for scoring user input against predefined categories using embeddings.
+    # Thread-safe class for scoring user input against predefined categories using embeddings:
 
     _instance = None
     _lock = threading.Lock()
@@ -20,38 +29,56 @@ class KeywordExtractor:
                     cls._instance._initialize()
         return cls._instance
 
+
     def _initialize(self):
 
-
-        # Initializing the model and pre-computing category embeddings
+        # Initializing the model and pre-computing category embeddings:
         self.model = SentenceTransformer('all-MiniLM-L6-v2')
 
-        # Define category keywords for embedding similarity
+        # Defining category keywords for embedding similarity:
         self.CATEGORY_KEYWORDS = {
             DescriptionCategory.SCENE: [
-                "scene", "setting", "environment", "location", "place", "background", "surroundings", "landscape", "area"
+                "scene", "where", "setting", "environment", "location", "place", "background", "surroundings", "landscape", "area"
+            ],
+            DescriptionCategory.PEOPLE: [
+                "people", "who", "person", "man", "woman", "child", "adult", "elderly", "group", "couple", "family", "faces",
+                "appearance", "gender", "age", "expression", "interaction", "pose", "body language"
             ],
             DescriptionCategory.ACTIVITY: [
-                "activity", "doing", "happening", "action", "movement", "event", "gesture", "interaction"
+                "activity", "doing", "happening", "action", "movement", "event", "gesture", "interaction", "playing", "working",
+                "walking", "running", "celebrating"
             ],
             DescriptionCategory.EMOTION: [
-                "emotion", "feeling", "mood", "expression", "happy", "sad", "angry", "excited", "peaceful"
+                "emotion", "feeling", "mood", "expression", "happy", "sad", "angry", "excited", "peaceful", "surprised",
+                "fearful", "disgusted", "confident"
             ],
             DescriptionCategory.ATMOSPHERE: [
-                "atmosphere", "vibe", "ambiance", "tone", "aura", "general mood", "overall feeling"
+                "atmosphere", "vibe", "ambiance", "tone", "aura", "general mood", "overall feeling", "energy", "tension",
+                "serenity", "vibrant", "gloomy"
             ],
             DescriptionCategory.COLOR: [
-                "color", "colors", "hue", "shades", "tints", "tones", "palette", "vivid", "bright", "dark"
+                "color", "colors", "hue", "shades", "tints", "tones", "palette", "vivid", "bright", "dark", "colorful",
+                "monochrome", "contrast", "saturated", "muted"
             ],
             DescriptionCategory.TEXT: [
-                "text", "sign", "words", "writing", "message", "letter", "caption", "label", "read", "say"
+                "text", "say", "sign", "words", "writing", "message", "letter", "caption", "label", "read",
+            ],
+            DescriptionCategory.OBJECTS: [
+                "object", "objects", "item", "thing", "equipment", "tool", "furniture", "vehicle", "device", "instrument",
+                "artifact", "symbol", "icon", "appliance", "gadget", "machinery", "props", "items"
+            ],
+            DescriptionCategory.DETAIL: [
+                "detail", "elaborate", "intricate", "specific", "fine details", "comprehensive", "thorough", "describe in detail",
+                "extensive", "in-depth", "nuance", "particulars", "minute details", "meticulous", "exhaustive"
             ],
             DescriptionCategory.CONCISENESS: [
-                "conciseness", "summary", "summarize", "brief", "short", "concise", "succinct", "overview", "highlight"
+                "conciseness", "summary", "summarize", "brief", "short", "concise", "succinct", "overview", "highlight", "quick",
+                "to the point", "abbreviated"
             ]
         }
 
-        # Pre-computing and storing the normalized average embeddings for each category
+
+        # Pre-computing and storing the normalized average embeddings for each category:
         self.CATEGORY_EMBEDDINGS = {}
         for category, keywords in self.CATEGORY_KEYWORDS.items():
             keyword_embeddings = self.model.encode(keywords, convert_to_tensor=False)
@@ -60,12 +87,12 @@ class KeywordExtractor:
             normalized_embedding = avg_embedding / norm if norm != 0 else avg_embedding
             self.CATEGORY_EMBEDDINGS[category] = normalized_embedding
 
+
     def score_categories(self, user_input: str) -> Dict[DescriptionCategory, float]:
-        # Scores user input against all categories:
         if not user_input.strip():
             return {category: 0.0 for category in self.CATEGORY_EMBEDDINGS}
 
-        # Encoding and normalizing the user input
+        # Encoding and normalizing the user input:
         input_embedding = self.model.encode([user_input], convert_to_tensor=False)[0]
         norm = np.linalg.norm(input_embedding)
         input_embedding = input_embedding / norm if norm != 0 else input_embedding
@@ -86,88 +113,124 @@ def test_scoring():
 
     test_cases = [
         # Scene Category (10 test cases)
-        ("What's happening in the picture?", DescriptionCategory.SCENE),
-        ("Describe the environment.", DescriptionCategory.SCENE),
+        ("What is the environment like?", DescriptionCategory.SCENE),
         ("Where is this scene taking place?", DescriptionCategory.SCENE),
-        ("Can you describe the surroundings?", DescriptionCategory.SCENE),
-        ("What's the setting of this image?", DescriptionCategory.SCENE),
-        ("Is it indoors or outdoors?", DescriptionCategory.SCENE),
-        ("What can you tell me about the location?", DescriptionCategory.SCENE),
-        ("Describe the background elements.", DescriptionCategory.SCENE),
-        ("What's the landscape like?", DescriptionCategory.SCENE),
-        ("Can you tell me about the area?", DescriptionCategory.SCENE),
+        ("Is the setting indoors or outdoors?", DescriptionCategory.SCENE),
+        ("What kind of environment is depicted?", DescriptionCategory.SCENE),
+        ("Can you tell me about the background?", DescriptionCategory.SCENE),
+        ("What does the landscape look like?", DescriptionCategory.SCENE),
+        ("Is there any notable scenery?", DescriptionCategory.SCENE),
+        ("What's the location shown in the image?", DescriptionCategory.SCENE),
+        ("Are there any landmarks visible?", DescriptionCategory.SCENE),
+        ("Can you describe the area where the action is happening?", DescriptionCategory.SCENE),
 
-        # Activities Category (10 test cases)
+        # People Category (10 test cases)
+        ("Are there any people in the image?", DescriptionCategory.PEOPLE),
+        ("Can you describe the individuals present?", DescriptionCategory.PEOPLE),
+        ("What do the people look like?", DescriptionCategory.PEOPLE),
+        ("How many people are there?", DescriptionCategory.PEOPLE),
+        ("Can you tell me about their appearance?", DescriptionCategory.PEOPLE),
+        ("What are the ages of the people?", DescriptionCategory.PEOPLE),
+        ("Are they male or female?", DescriptionCategory.PEOPLE),
+        ("Can you describe who is in the group?", DescriptionCategory.PEOPLE),
+        ("What expressions do the people have?", DescriptionCategory.PEOPLE),
+        ("Is there any interaction between the people?", DescriptionCategory.PEOPLE),
+
+        # Activity Category (10 test cases)
         ("What are the people doing?", DescriptionCategory.ACTIVITY),
-        ("Is there any movement happening?", DescriptionCategory.ACTIVITY),
-        ("Describe any actions occurring.", DescriptionCategory.ACTIVITY),
-        ("Are there any interactions between individuals?", DescriptionCategory.ACTIVITY),
-        ("What events are taking place?", DescriptionCategory.ACTIVITY),
-        ("What's going on in the image?", DescriptionCategory.ACTIVITY),
-        ("Are any sports being played?", DescriptionCategory.ACTIVITY),
-        ("What kind of activities are visible?", DescriptionCategory.ACTIVITY),
-        ("Is anyone engaged in a task?", DescriptionCategory.ACTIVITY),
-        ("Can you describe the motion in the scene?", DescriptionCategory.ACTIVITY),
+        ("Is there any action taking place?", DescriptionCategory.ACTIVITY),
+        ("Can you describe any movements?", DescriptionCategory.ACTIVITY),
+        ("Are they engaged in any activities?", DescriptionCategory.ACTIVITY),
+        ("What is happening in the image?", DescriptionCategory.ACTIVITY),
+        ("Is anyone performing a specific task?", DescriptionCategory.ACTIVITY),
+        ("Are there any events occurring?", DescriptionCategory.ACTIVITY),
+        ("Can you tell me about any gestures?", DescriptionCategory.ACTIVITY),
+        ("What actions are visible?", DescriptionCategory.ACTIVITY),
+        ("Is there any interaction happening?", DescriptionCategory.ACTIVITY),
 
-        # Emotions Category (10 test cases)
-        ("How are the people feeling?", DescriptionCategory.EMOTION),
-        ("Describe the emotions shown.", DescriptionCategory.EMOTION),
-        ("What expressions do you see?", DescriptionCategory.EMOTION),
-        ("Are they happy or sad?", DescriptionCategory.EMOTION),
-        ("Can you tell if they are excited?", DescriptionCategory.EMOTION),
-        ("Do they look surprised?", DescriptionCategory.EMOTION),
-        ("Is anyone laughing or crying?", DescriptionCategory.EMOTION),
-        ("What's the emotional state of the characters?", DescriptionCategory.EMOTION),
-        ("Can you sense any feelings?", DescriptionCategory.EMOTION),
-        ("How does everyone seem emotionally?", DescriptionCategory.EMOTION),
+        # Emotion Category (10 test cases)
+        ("Can you tell how the people are feeling?", DescriptionCategory.EMOTION),
+        ("What emotions are displayed?", DescriptionCategory.EMOTION),
+        ("Do they look happy or sad?", DescriptionCategory.EMOTION),
+        ("Can you describe their facial expressions?", DescriptionCategory.EMOTION),
+        ("Is there any sign of excitement?", DescriptionCategory.EMOTION),
+        ("How would you describe their mood?", DescriptionCategory.EMOTION),
+        ("Are they showing any emotions?", DescriptionCategory.EMOTION),
+        ("What is the emotional tone?", DescriptionCategory.EMOTION),
+        ("Can you sense any feelings from the image?", DescriptionCategory.EMOTION),
+        ("Are there any expressions of anger or joy?", DescriptionCategory.EMOTION),
 
         # Atmosphere Category (10 test cases)
-        ("What's the overall atmosphere?", DescriptionCategory.ATMOSPHERE),
-        ("Describe the vibe of the scene.", DescriptionCategory.ATMOSPHERE),
-        ("What's the general mood here?", DescriptionCategory.ATMOSPHERE),
-        ("Does the setting feel tense or relaxed?", DescriptionCategory.ATMOSPHERE),
-        ("Is there a festive atmosphere?", DescriptionCategory.ATMOSPHERE),
-        ("Does it seem calm or chaotic?", DescriptionCategory.ATMOSPHERE),
-        ("What's the tone of the image?", DescriptionCategory.ATMOSPHERE),
-        ("How would you describe the ambiance?", DescriptionCategory.ATMOSPHERE),
-        ("What's the feel of the setting?", DescriptionCategory.ATMOSPHERE),
-        ("Is there a particular mood conveyed?", DescriptionCategory.ATMOSPHERE),
+        ("What's the overall atmosphere like?", DescriptionCategory.ATMOSPHERE),
+        ("Can you describe the mood of the scene?", DescriptionCategory.ATMOSPHERE),
+        ("Does the image convey a particular vibe?", DescriptionCategory.ATMOSPHERE),
+        ("Is there a tense or relaxed ambiance?", DescriptionCategory.ATMOSPHERE),
+        ("How would you describe the tone?", DescriptionCategory.ATMOSPHERE),
+        ("Is the scene vibrant or gloomy?", DescriptionCategory.ATMOSPHERE),
+        ("What's the general feeling you get from the image?", DescriptionCategory.ATMOSPHERE),
+        ("Does the setting have a peaceful aura?", DescriptionCategory.ATMOSPHERE),
+        ("Can you tell me about the energy in the scene?", DescriptionCategory.ATMOSPHERE),
+        ("What is the vibe of the image?", DescriptionCategory.ATMOSPHERE),
 
-        # Colors Category (10 test cases)
-        ("Describe the colors in the image.", DescriptionCategory.COLOR),
-        ("What are the dominant hues?", DescriptionCategory.COLOR),
-        ("Are there any bright colors?", DescriptionCategory.COLOR),
-        ("Is the picture colorful?", DescriptionCategory.COLOR),
-        ("Can you tell me about the color palette?", DescriptionCategory.COLOR),
-        ("What colors stand out the most?", DescriptionCategory.COLOR),
-        ("Are the colors warm or cool?", DescriptionCategory.COLOR),
-        ("Do any shades catch your eye?", DescriptionCategory.COLOR),
-        ("Is the image vivid or dull?", DescriptionCategory.COLOR),
-        ("How would you describe the tones?", DescriptionCategory.COLOR),
+        # Color Category (10 test cases)
+        ("What are the main colors in the image?", DescriptionCategory.COLOR),
+        ("Can you describe the color palette?", DescriptionCategory.COLOR),
+        ("Are there any bright or vivid colors?", DescriptionCategory.COLOR),
+        ("Is the image mostly dark or light?", DescriptionCategory.COLOR),
+        ("Are there any contrasting colors?", DescriptionCategory.COLOR),
+        ("How would you describe the hues present?", DescriptionCategory.COLOR),
+        ("Is the scene colorful or monochrome?", DescriptionCategory.COLOR),
+        ("Do any colors stand out?", DescriptionCategory.COLOR),
+        ("Are there any shades or tints you can mention?", DescriptionCategory.COLOR),
+        ("Does the image have saturated or muted tones?", DescriptionCategory.COLOR),
 
         # Text Category (10 test cases)
-        ("Is there any text visible?", DescriptionCategory.TEXT),
-        ("Can you read any signs?", DescriptionCategory.TEXT),
+        ("Is there any text visible in the image?", DescriptionCategory.TEXT),
+        ("Can you read any signs or labels?", DescriptionCategory.TEXT),
         ("What does the writing say?", DescriptionCategory.TEXT),
-        ("Are there any words displayed?", DescriptionCategory.TEXT),
-        ("Is there a caption or label?", DescriptionCategory.TEXT),
-        ("What does the billboard say?", DescriptionCategory.TEXT),
-        ("Are there any warnings posted?", DescriptionCategory.TEXT),
-        ("Can you see any written messages?", DescriptionCategory.TEXT),
-        ("Is there any lettering present?", DescriptionCategory.TEXT),
-        ("Are there any posters with text?", DescriptionCategory.TEXT),
+        ("Are there any posters or billboards?", DescriptionCategory.TEXT),
+        ("Is there any graffiti or messages?", DescriptionCategory.TEXT),
+        ("Can you tell me about any letters or words?", DescriptionCategory.TEXT),
+        ("Is there a caption or title shown?", DescriptionCategory.TEXT),
+        ("Are there any notices or announcements?", DescriptionCategory.TEXT),
+        ("Does the image contain any readable content?", DescriptionCategory.TEXT),
+        ("Can you describe any text elements present?", DescriptionCategory.TEXT),
+
+        # Objects Category (10 test cases)
+        ("Can you describe the objects in the image?", DescriptionCategory.OBJECTS),
+        ("What items are present?", DescriptionCategory.OBJECTS),
+        ("Are there any vehicles or devices?", DescriptionCategory.OBJECTS),
+        ("Can you tell me about any tools or equipment?", DescriptionCategory.OBJECTS),
+        ("What kind of furniture is visible?", DescriptionCategory.OBJECTS),
+        ("Are there any significant artifacts?", DescriptionCategory.OBJECTS),
+        ("Do you see any appliances or gadgets?", DescriptionCategory.OBJECTS),
+        ("Can you describe any props or items?", DescriptionCategory.OBJECTS),
+        ("Are there any symbols or icons present?", DescriptionCategory.OBJECTS),
+        ("What things are in the scene?", DescriptionCategory.OBJECTS),
+
+        # Detail Category (10 test cases)
+        ("Can you provide more detailed information?", DescriptionCategory.DETAIL),
+        ("I would like an in-depth description.", DescriptionCategory.DETAIL),
+        ("Please describe all the specifics.", DescriptionCategory.DETAIL),
+        ("Can you elaborate on the image?", DescriptionCategory.DETAIL),
+        ("Tell me all the fine details.", DescriptionCategory.DETAIL),
+        ("I prefer a thorough explanation.", DescriptionCategory.DETAIL),
+        ("Can you be more specific?", DescriptionCategory.DETAIL),
+        ("Describe everything in detail.", DescriptionCategory.DETAIL),
+        ("Please give me an exhaustive description.", DescriptionCategory.DETAIL),
+        ("Can you provide a comprehensive overview?", DescriptionCategory.DETAIL),
 
         # Conciseness Category (10 test cases)
-        ("Can you summarize the image briefly?", DescriptionCategory.CONCISENESS),
-        ("Please provide a short description.", DescriptionCategory.CONCISENESS),
+        ("Can you give me a brief summary?", DescriptionCategory.CONCISENESS),
+        ("Please keep the description short.", DescriptionCategory.CONCISENESS),
+        ("I prefer a concise explanation.", DescriptionCategory.CONCISENESS),
+        ("Can you summarize the image quickly?", DescriptionCategory.CONCISENESS),
+        ("Just highlight the main points.", DescriptionCategory.CONCISENESS),
         ("Give me a quick overview.", DescriptionCategory.CONCISENESS),
-        ("Can you keep it concise?", DescriptionCategory.CONCISENESS),
-        ("Summarize what you see.", DescriptionCategory.CONCISENESS),
-        ("I prefer a brief explanation.", DescriptionCategory.CONCISENESS),
-        ("Just tell me the main points.", DescriptionCategory.CONCISENESS),
-        ("Please be succinct in your description.", DescriptionCategory.CONCISENESS),
-        ("Can you make it short and to the point?", DescriptionCategory.CONCISENESS),
-        ("How about a condensed version?", DescriptionCategory.CONCISENESS),
+        ("Please be succinct.", DescriptionCategory.CONCISENESS),
+        ("Make it short and to the point.", DescriptionCategory.CONCISENESS),
+        ("Can you provide a brief description?", DescriptionCategory.CONCISENESS),
+        ("I'd like an abbreviated version.", DescriptionCategory.CONCISENESS),
     ]
 
     total_score = 0
@@ -184,12 +247,26 @@ def test_scoring():
         category_score = (n_categories - expected_index) / n_categories if expected_index is not None else 0
         total_score += category_score
 
-        # Print results for each test case
-        print(f"Test Case {i}: {input_text}")
-        print(f"Expected Category: {expected_category.name} (Index: {expected_index + 1 if expected_index is not None else 'Not found'})")
-        print(f"Category Score for this test case: {category_score:.2f}\n")
+        if expected_index == 0:
+            color_code = "\033[92m" 
+        elif expected_index == 1:
+            color_code = "\033[93m"  
+        elif expected_index == 2:
+            color_code = "\033[33m"
+        elif 3 <= expected_index <= 5:
+            color_code = "\033[31m"  
+        else:
+            color_code = "\033[0m"   
 
-    # Calculate and print final accuracy
+        print(f"Test Case {i}: {input_text}")
+        print(f"Expected Category: {expected_category.name} {color_code}(Rank: {expected_index + 1 if expected_index is not None else 'Not found'})\033[0m\n\n")
+
+        if expected_index != 0:
+            print("Full Category Scores:")
+            for category, score in sorted_scores:
+                print(f"{category.name}: {score:.2f}")
+            print("\n")
+
     final_accuracy = (total_score / n_test_cases) * 100
     print(f"Final Accuracy: {final_accuracy:.2f}%")
 

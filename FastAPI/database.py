@@ -1,10 +1,8 @@
 import os
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-
-from strings import *
 
 # Environment variable for the database URI:
 DB_URI = os.getenv("DB_URI")

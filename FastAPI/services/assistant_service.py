@@ -11,24 +11,27 @@ from fastapi import UploadFile, HTTPException
 from pyneuphonic import Neuphonic, TTSConfig
 
 from services.ml_services.keyword_extraction import KeywordExtractor
+from services.ml_services.preference_prediction import predict_preferences
+
 from exceptions import NoMessageException, UnprocessableMessageException, APIRequestException, MessageNotFoundException
 from dependencies import db_dependency, user_dependency
-from models import Message, MessageInsight
-from strings import ASSISTANT_CONTEXT
-from enums import MessageType, AIModel, TTSModel, OpenAIVoice, MessageFeedback
+from models import Message, MessageInsight, UserInsight
+from dynamic_prompts import get_dynamic_prompt
+from enums import MessageType, AIModel, TTSModel, OpenAIVoice, MessageFeedback, DescriptionCategory
 
 client = OpenAI()
 
 # Initializing the Neuphonic client:
 neuphonic_client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_KEY'))
 
-# Initializing the nlp extractor:
-# keyword_extractor = KeywordExtractor()
+# Initializing the nlp extractor - TODO: Local only, too memory-expensive for Render hosting:
+keyword_extractor = KeywordExtractor()
 
 
 def get_messages(db: db_dependency, user: user_dependency, limit: int = 20) -> List[Message]:
     user_messages = get_user_messages(db, user, limit)
-    return format_messages([Message(type=MessageType.SYSTEM, text=ASSISTANT_CONTEXT)] + user_messages, user)
+    system_prompt = get_dynamic_prompt(user)
+    return format_messages([Message(type=MessageType.SYSTEM, text=system_prompt)] + user_messages, user)
 
 
 # Returns messages between a specific user and the assistant:
@@ -62,11 +65,11 @@ def add_message(db: db_dependency, user: user_dependency, type: MessageType, tex
     db.commit()
     db.refresh(new_message)
 
-    # Scoring the message:
-    # scores = keyword_extractor.score_categories(text)
-    # for category, score in scores.items():
-    #     db.add(MessageInsight(message_id=new_message.id, category=category, score=score))
-    # db.commit()
+    # Scoring the message - TODO: Local only, too memory-expensive for Render hosting:
+    scores = keyword_extractor.score_categories(text)
+    for category, score in scores.items():
+        db.add(MessageInsight(message_id=new_message.id, category=category.value, score=score))
+    db.commit()
 
     return new_message
 
@@ -83,6 +86,7 @@ def add_message_feedback(db: db_dependency, user, message_id: int, feedback: Mes
     message.feedback = feedback
     db.commit()
 
+
 def delete_messages(db: db_dependency, user: user_dependency) -> None:
     messages = db.query(Message).filter((Message.user_id == user.id) & ((Message.type == MessageType.USER) | (Message.type == MessageType.ASSISTANT))).all()
     for message in messages: db.delete(message)
@@ -93,6 +97,7 @@ def speech_to_text(audio_bytes: bytes, file_name: str) -> str:
     audio_file = BytesIO(audio_bytes)
     audio_file.name = file_name
     result = client.audio.transcriptions.create(model="whisper-1", file=audio_file).text
+    print(f"\033[1;33mConverted speech to text: {result}\033[0m")
     return result
 
 
@@ -140,7 +145,8 @@ def text_to_speech(text: str, voice: OpenAIVoice = OpenAIVoice.ALLOY) -> str:
 
     # Encoding to base64:
     encoded_audio = base64.b64encode(audio_bytes).decode("utf-8")
-
+    print(f"\033[1;32mConverted text output to speech.\033[0m")
+    
     return encoded_audio
 
 
@@ -154,8 +160,11 @@ def send_completion_request(_: user_dependency, messages: dict, encoded_image: s
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}"}
     payload = {"model": model.value, "messages": messages, "max_tokens": max_tokens}
 
+
     # Sending the completion request:
+    print(f"\033[1;32mSent completion request.\033[0m")
     response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
+    print(f"\033[1;32mReceived completion response.\033[0m")
 
     # Checking if the response is successful:
     if response.status_code != 200:
@@ -180,6 +189,9 @@ async def completion(db: db_dependency, user: user_dependency, text: Optional[st
                      max_tokens: int = 300, context_message_count: int = 20) -> dict:
 
     try:
+        # Updating the user's insights - TODO: Local only, too memory-expensive for Render hosting:
+        update_user_insights(db, user)
+
         # If at least one type of input is not provided, raising an exception:
         if not any([text, audio, image, encoded_image]):
             raise NoMessageException
@@ -234,4 +246,34 @@ async def completion(db: db_dependency, user: user_dependency, text: Optional[st
     except Exception as e:
         print(f"Error during completion: {e}")
         raise UnprocessableMessageException from e
-        
+
+
+def update_user_insights(db: db_dependency, user: user_dependency):
+    # Predicting user preferences:
+    preferences = predict_preferences(db, user.id)
+
+    initial_preferences = {category.name: float(score) for category, score in preferences.items()}
+
+    if preferences:
+        for category_str, score in preferences.items():
+            # Convert the category string back to the enum
+            try:
+                category_enum = DescriptionCategory(category_str)
+            except ValueError:
+                continue
+
+            # Convert score to native Python float
+            score = float(score)
+
+            # Checking if the user already has an insight for this category:
+            user_insight = db.query(UserInsight).filter_by(user_id=user.id, category=category_enum).first()
+            if user_insight:
+                # Updating the existing insight's score:
+                user_insight.score = score
+            else:
+                # Creating a new insight for the category:
+                db.add(UserInsight(user_id=user.id, category=category_enum, score=score))
+
+        db.commit()
+
+    final_preferences = {category.name: float(score) for category, score in preferences.items()}

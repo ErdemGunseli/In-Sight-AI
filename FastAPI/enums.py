@@ -8,20 +8,23 @@ class MessageType(Enum):
 
 
 class DescriptionCategory(Enum):
-    SCENE = "scene"
-    ACTIVITY = "activity"
-    EMOTION = "emotion"
-    ATMOSPHERE = "atmosphere"
-    COLOR = "color"
-    TEXT = "text"
-    CONCISENESS = "conciseness"
+    SCENE = "SCENE"
+    PEOPLE = "PEOPLE"
+    ACTIVITY = "ACTIVITY"
+    EMOTION = "EMOTION"
+    ATMOSPHERE = "ATMOSPHERE"
+    COLOR = "COLOR"
+    TEXT = "TEXT"
+    OBJECTS = "OBJECTS"
+    DETAIL = "DETAIL"
+    CONCISENESS = "CONCISENESS"
 
 
 class MessageFeedback(Enum):
     POSITIVE = "positive"
     NEGATIVE = "negative"
     NEUTRAL = "neutral"
-    
+
 
 class AIModel(Enum):
     GPT_4O = "gpt-4o"
