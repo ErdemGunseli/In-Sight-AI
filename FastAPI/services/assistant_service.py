@@ -15,7 +15,7 @@ from services.ml_services.preference_prediction import predict_preferences
 
 from exceptions import NoMessageException, UnprocessableMessageException, APIRequestException, MessageNotFoundException
 from dependencies import db_dependency, user_dependency
-from models import Message, MessageInsight, UserInsight
+from models import Message, UserInsight
 from dynamic_prompts import get_dynamic_prompt
 from enums import MessageType, AIModel, TTSModel, OpenAIVoice, MessageFeedback, DescriptionCategory
 
@@ -190,7 +190,7 @@ async def completion(db: db_dependency, user: user_dependency, text: Optional[st
 
     try:
         # Updating the user's insights - TODO: Local only, too memory-expensive for Render hosting:
-        update_user_insights(db, user)
+        # update_user_insights(db, user)
 
         # If at least one type of input is not provided, raising an exception:
         if not any([text, audio, image, encoded_image]):
@@ -252,8 +252,6 @@ def update_user_insights(db: db_dependency, user: user_dependency):
     # Predicting user preferences:
     preferences = predict_preferences(db, user.id)
 
-    initial_preferences = {category.name: float(score) for category, score in preferences.items()}
-
     if preferences:
         for category_str, score in preferences.items():
             # Convert the category string back to the enum
@@ -275,5 +273,3 @@ def update_user_insights(db: db_dependency, user: user_dependency):
                 db.add(UserInsight(user_id=user.id, category=category_enum, score=score))
 
         db.commit()
-
-    final_preferences = {category.name: float(score) for category, score in preferences.items()}
