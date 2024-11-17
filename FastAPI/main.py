@@ -54,7 +54,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from services.ml_services.preference_prediction import schedule_model_training, shutdown_scheduler
 
 # Initialize scheduler - TODO: Local only, too memory-expensive for Render hosting:
-scheduler = BackgroundScheduler()
+# scheduler = BackgroundScheduler()
 
 # Create a Console instance
 console = Console()
@@ -63,13 +63,14 @@ console = Console()
 def startup_event():
     print("\033[1;32mApplication startup successful.\033[0m")
     
-    # Scheduling the training:
-    schedule_model_training(scheduler)
+    # Scheduling the training - TODO: Local only, too memory-expensive for Render hosting:
+    # schedule_model_training(scheduler)
     print("\033[1;34mScheduler started and model training job scheduled.\033[0m")
 
 @app.on_event("shutdown")
 def shutdown_event():
-    shutdown_scheduler(scheduler)
+    # Shutting down the scheduler - TODO: Local only, too memory-expensive for Render hosting:
+    # shutdown_scheduler(scheduler)
     print("\033[1;31mApplication shutdown\033[0m")
 
 if __name__ == "__main__":
