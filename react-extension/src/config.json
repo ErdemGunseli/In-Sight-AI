@@ -1,4 +1,5 @@
 {
-    "BASE_URL": "http://localhost:8000",
-    "BASE_URL2": "https://aiscreenreader.onrender.com"
+    "BASE_URL": "https://aiscreenreader.onrender.com",
+    "BASE_URL2": "http://localhost:8000"
+
 }
