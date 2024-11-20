@@ -10,8 +10,8 @@ from openai import OpenAI
 from fastapi import UploadFile, HTTPException
 from pyneuphonic import Neuphonic, TTSConfig
 
-from services.ml_services.keyword_extraction import KeywordExtractor
-from services.ml_services.preference_prediction import predict_preferences
+# from services.ml_services.keyword_extraction import KeywordExtractor
+# from services.ml_services.preference_prediction import predict_preferences
 
 from exceptions import NoMessageException, UnprocessableMessageException, APIRequestException, MessageNotFoundException
 from dependencies import db_dependency, user_dependency
@@ -248,28 +248,28 @@ async def completion(db: db_dependency, user: user_dependency, text: Optional[st
         raise UnprocessableMessageException from e
 
 
-def update_user_insights(db: db_dependency, user: user_dependency):
-    # Predicting user preferences:
-    preferences = predict_preferences(db, user.id)
+# def update_user_insights(db: db_dependency, user: user_dependency):
+#     # Predicting user preferences:
+#     preferences = predict_preferences(db, user.id)
 
-    if preferences:
-        for category_str, score in preferences.items():
-            # Convert the category string back to the enum
-            try:
-                category_enum = DescriptionCategory(category_str)
-            except ValueError:
-                continue
+#     if preferences:
+#         for category_str, score in preferences.items():
+#             # Convert the category string back to the enum
+#             try:
+#                 category_enum = DescriptionCategory(category_str)
+#             except ValueError:
+#                 continue
 
-            # Convert score to native Python float
-            score = float(score)
+#             # Convert score to native Python float
+#             score = float(score)
 
-            # Checking if the user already has an insight for this category:
-            user_insight = db.query(UserInsight).filter_by(user_id=user.id, category=category_enum).first()
-            if user_insight:
-                # Updating the existing insight's score:
-                user_insight.score = score
-            else:
-                # Creating a new insight for the category:
-                db.add(UserInsight(user_id=user.id, category=category_enum, score=score))
+#             # Checking if the user already has an insight for this category:
+#             user_insight = db.query(UserInsight).filter_by(user_id=user.id, category=category_enum).first()
+#             if user_insight:
+#                 # Updating the existing insight's score:
+#                 user_insight.score = score
+#             else:
+#                 # Creating a new insight for the category:
+#                 db.add(UserInsight(user_id=user.id, category=category_enum, score=score))
 
-        db.commit()
+#         db.commit()

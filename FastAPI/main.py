@@ -8,10 +8,7 @@ from dotenv import load_dotenv
 import uvicorn
 import os
 import sys
-from rich.console import Console
-from rich.table import Table
-from rich.progress import track
-import time
+
 
 # Loading environment variables and declaring FastAPI instance before local imports:
 load_dotenv()
@@ -50,14 +47,11 @@ app.include_router(assistant.router)
 app.include_router(auth.router)
 app.include_router(users.router)
 
-from apscheduler.schedulers.background import BackgroundScheduler
-from services.ml_services.preference_prediction import schedule_model_training, shutdown_scheduler
+# from apscheduler.schedulers.background import BackgroundScheduler
+# from services.ml_services.preference_prediction import schedule_model_training, shutdown_scheduler
 
 # Initialize scheduler - TODO: Local only, too memory-expensive for Render hosting:
 # scheduler = BackgroundScheduler()
-
-# Create a Console instance
-console = Console()
 
 @app.on_event("startup")
 def startup_event():
