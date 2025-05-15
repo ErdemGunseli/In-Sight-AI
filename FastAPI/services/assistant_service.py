@@ -9,6 +9,7 @@ import wave
 from openai import OpenAI
 from fastapi import UploadFile, HTTPException
 from pyneuphonic import Neuphonic, TTSConfig
+from fastapi.concurrency import run_in_threadpool
 
 # from services.ml_services.keyword_extraction import KeywordExtractor
 # from services.ml_services.preference_prediction import predict_preferences
@@ -200,7 +201,9 @@ async def completion(db: db_dependency, user: user_dependency, text: Optional[st
         if audio:
             # Reading the audio and converting to text:
             audio_bytes = await audio.read()
-            transcription = speech_to_text(audio_bytes, audio.filename)
+            transcription = await run_in_threadpool(
+                speech_to_text, audio_bytes, audio.filename
+            )
             await audio.close()
 
         if image and not encoded_image:
@@ -214,28 +217,37 @@ async def completion(db: db_dependency, user: user_dependency, text: Optional[st
 
         # Adding the user's message to the DB:
         if user_text:
-            add_message(db, user, MessageType.USER, user_text)
+            await run_in_threadpool(add_message, db, user, MessageType.USER, user_text)
 
         # Getting all the messages associated with the user:
-        messages = get_messages(db, user, context_message_count)
+        messages = await run_in_threadpool(get_messages, db, user, context_message_count)
 
         # User message object needed to attach image:
         if not user_text:
             messages.append(format_message(Message(type=MessageType.USER, text=user_text), user))
 
         # Sending the completion request:
-        completion_text = send_completion_request(user, messages, encoded_image, model, max_tokens=max_tokens)
+        completion_text = await run_in_threadpool(
+            send_completion_request,
+            user, messages, encoded_image, model, max_tokens,
+        )
 
         encoded_audio = None
         if generate_audio:
             # Determining which TTS function to use based on tts_model:
             if tts_model == TTSModel.OPENAI:
-                encoded_audio = text_to_speech(completion_text, openai_voice)
+                encoded_audio = await run_in_threadpool(
+                    text_to_speech, completion_text, openai_voice
+                )
             elif tts_model == TTSModel.NEUPHONIC:
-                encoded_audio = neuphonic_text_to_speech(completion_text)
+                encoded_audio = await run_in_threadpool(
+                    neuphonic_text_to_speech, completion_text
+                )
             
         # Adding the assistant response to the DB:
-        assistant_message = add_message(db, user, MessageType.ASSISTANT, completion_text, encoded_audio)
+        assistant_message = await run_in_threadpool(
+            add_message, db, user, MessageType.ASSISTANT, completion_text, encoded_audio
+        )
 
         return assistant_message
 
