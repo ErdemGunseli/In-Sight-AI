@@ -1,20 +1,29 @@
 import os
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-# Environment variable for the database URI:
-DB_URI = os.getenv("DB_URI")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-# Declaring the engine to connect with the DB:
-engine = create_engine(DB_URI, pool_pre_ping=True)
+# If shared DB, set per service:
+SCHEMA = os.getenv("SCHEMA", None)
 
-# sessionmaker class is used to create session objects to connect & interact with the DB:
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+metadata = MetaData(schema=SCHEMA) if SCHEMA else MetaData()
+Base = declarative_base(metadata=metadata)
 
-# declarative_base function is used to create a base class for all data models:
-Base = declarative_base()
+connect_args = {}
+
+# Postgres accepts the option string “-c key=value”:
+if SCHEMA: connect_args["options"] = f"-csearch_path=\"{SCHEMA}\""
 
 
+engine = create_engine(
+    DATABASE_URL,
+    pool_size=5,
+    max_overflow=2,
+    future=True,
+    connect_args=connect_args,
+)
 
+SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
