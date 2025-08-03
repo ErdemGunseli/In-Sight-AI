@@ -1,6 +1,6 @@
 import os
 
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import create_engine, MetaData, text
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -25,5 +25,9 @@ engine = create_engine(
     future=True,
     connect_args=connect_args,
 )
+
+if SCHEMA:
+    with engine.begin() as conn:
+        conn.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA}"))
 
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
