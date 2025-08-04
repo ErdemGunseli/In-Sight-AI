@@ -50,7 +50,7 @@ packaging==24.0
 passlib==1.7.4
 pillow==10.4.0
 preshed==3.0.9
-psycopg2==2.9.9
+psycopg2-binary==2.9.9
 pyasn1==0.6.0
 pydantic==2.9.2
 pydantic_core==2.23.4
