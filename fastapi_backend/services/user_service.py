@@ -1,10 +1,10 @@
 from sqlalchemy.exc import IntegrityError
 
-from exceptions import UserExistsException
-from dependencies import db_dependency, user_dependency
-from schemas import CreateUserRequest
-from models import User
-from security import bcrypt_context
+from ..exceptions import UserExistsException
+from ..dependencies import db_dependency, user_dependency
+from ..schemas import CreateUserRequest
+from ..models import User
+from ..security import bcrypt_context
 
 
 def create_user(db: db_dependency, user_data: CreateUserRequest) -> User:

@@ -7,12 +7,7 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer
 
-# Adding parent directory so enums import works when running standalone file (for testing):
-current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.dirname(os.path.dirname(current_dir))
-sys.path.insert(0, parent_dir)
-
-from enums import DescriptionCategory
+from ...enums import DescriptionCategory
 
 
 class KeywordExtractor:

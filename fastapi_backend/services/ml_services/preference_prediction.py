@@ -8,9 +8,9 @@ import numpy as np
 import pickle
 from apscheduler.schedulers.background import BackgroundScheduler
 
-from models import User, Message, MessageInsight, MessageFeedback
-from enums import MessageType, DescriptionCategory
-from database import engine
+from ...models import User, Message, MessageInsight, MessageFeedback
+from ...enums import MessageType, DescriptionCategory
+from ...database import engine
 
 # Configuring logging:
 logging.basicConfig(level=logging.INFO)

@@ -2,7 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field, EmailStr
 
-from enums import MessageType, MessageFeedback
+from .enums import MessageType, MessageFeedback
 
 
 class CreateUserRequest(BaseModel):

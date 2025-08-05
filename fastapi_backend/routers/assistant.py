@@ -4,11 +4,11 @@ from fastapi import APIRouter, status as st, UploadFile, File, Form, Request, HT
 from starlette.requests import Request
 from sqlalchemy.orm import Session
 
-from rate_limiter import limiter
-from enums import AIModel, TTSModel, OpenAIVoice, MessageFeedback
-from services import assistant_service
-from schemas import MessageResponse
-from dependencies import db_dependency, user_dependency, get_db, get_current_user
+from ..rate_limiter import limiter
+from ..enums import AIModel, TTSModel, OpenAIVoice, MessageFeedback
+from ..services import assistant_service
+from ..schemas import MessageResponse
+from ..dependencies import db_dependency, user_dependency, get_db, get_current_user
 
 router = APIRouter(prefix="/assistant", tags=["Assistant"])
 

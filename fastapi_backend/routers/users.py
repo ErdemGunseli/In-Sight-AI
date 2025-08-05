@@ -1,10 +1,10 @@
 from fastapi import APIRouter, status as st
 from starlette.requests import Request
 
-from rate_limiter import limiter
-from services import user_service as us
-from schemas import CreateUserRequest, UserResponse
-from dependencies import user_dependency, db_dependency
+from ..rate_limiter import limiter
+from ..services import user_service as us
+from ..schemas import CreateUserRequest, UserResponse
+from ..dependencies import user_dependency, db_dependency
 
 
 router = APIRouter(prefix="/user", tags=["User"])

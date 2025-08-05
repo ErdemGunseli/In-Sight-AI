@@ -2,8 +2,8 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, String, ForeignKey, Enum, DateTime, Boolean, Float
 
-from database import Base
-from enums import MessageType, DescriptionCategory, MessageFeedback
+from .database import Base
+from .enums import MessageType, DescriptionCategory, MessageFeedback
 
 
 class User(Base):

@@ -11,14 +11,14 @@ from fastapi import UploadFile, HTTPException
 from pyneuphonic import Neuphonic, TTSConfig
 from fastapi.concurrency import run_in_threadpool
 
-# from services.ml_services.keyword_extraction import KeywordExtractor
-# from services.ml_services.preference_prediction import predict_preferences
+# from .ml_services.keyword_extraction import KeywordExtractor
+# from .ml_services.preference_prediction import predict_preferences
 
-from exceptions import NoMessageException, UnprocessableMessageException, APIRequestException, MessageNotFoundException
-from dependencies import db_dependency, user_dependency
-from models import Message, UserInsight
-from dynamic_prompts import get_dynamic_prompt
-from enums import MessageType, AIModel, TTSModel, OpenAIVoice, MessageFeedback, DescriptionCategory
+from ..exceptions import NoMessageException, UnprocessableMessageException, APIRequestException, MessageNotFoundException
+from ..dependencies import db_dependency, user_dependency
+from ..models import Message, UserInsight
+from ..dynamic_prompts import get_dynamic_prompt
+from ..enums import MessageType, AIModel, TTSModel, OpenAIVoice, MessageFeedback, DescriptionCategory
 
 client = OpenAI()
 

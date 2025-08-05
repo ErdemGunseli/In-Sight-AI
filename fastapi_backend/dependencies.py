@@ -5,10 +5,10 @@ from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from jose import jwt, JWTError
 
-from exceptions import JWTException, UserNotFoundException
-from database import SessionLocal
-from models import User
-from security import HASH_SECRET_KEY, HASH_ALGORITHM
+from .exceptions import JWTException, UserNotFoundException
+from .database import SessionLocal
+from .models import User
+from .security import HASH_SECRET_KEY, HASH_ALGORITHM
 
 
 # Using generator as context manager to manage the DB session:

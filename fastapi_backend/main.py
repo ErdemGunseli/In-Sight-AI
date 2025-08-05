@@ -16,12 +16,12 @@ app = FastAPI()
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from handlers import validation_exception_handler
-from routers import root, assistant, auth, users
-from database import engine
-import models
+from .handlers import validation_exception_handler
+from .routers import root, assistant, auth, users
+from .database import engine
+from . import models
 
-from rate_limiter import limiter
+from .rate_limiter import limiter
 
 # Adding CORS middleware before other middleware:
 app.add_middleware(
@@ -48,7 +48,7 @@ app.include_router(auth.router)
 app.include_router(users.router)
 
 # from apscheduler.schedulers.background import BackgroundScheduler
-# from services.ml_services.preference_prediction import schedule_model_training, shutdown_scheduler
+# from .services.ml_services.preference_prediction import schedule_model_training, shutdown_scheduler
 
 # Initialize scheduler - TODO: Local only, too memory-expensive for Render hosting:
 # scheduler = BackgroundScheduler()

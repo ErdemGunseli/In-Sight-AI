@@ -1,7 +1,7 @@
-from exceptions import UserNotFoundException, InvalidCredentialsException
-from dependencies import db_dependency, auth_dependency
-from models import User
-from security import bcrypt_context, create_access_token
+from ..exceptions import UserNotFoundException, InvalidCredentialsException
+from ..dependencies import db_dependency, auth_dependency
+from ..models import User
+from ..security import bcrypt_context, create_access_token
 
 
 def authenticate_user(db: db_dependency, email: str, password: str) -> User:
