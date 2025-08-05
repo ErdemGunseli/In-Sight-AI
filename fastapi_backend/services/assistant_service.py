@@ -22,6 +22,9 @@ from ..enums import MessageType, AIModel, TTSModel, OpenAIVoice, MessageFeedback
 
 client = OpenAI()
 
+# Load API key at startup before env vars are cleared:
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+
 # Initializing the Neuphonic client:
 neuphonic_client = Neuphonic(api_key=os.environ.get('NEUPHONIC_API_KEY'))
 
@@ -158,9 +161,8 @@ def send_completion_request(_: user_dependency, messages: dict, encoded_image: s
         # There will always be a content field due to the formatting method.
         messages[-1]["content"].append({"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{encoded_image}"}})
         
-    headers = {"Content-Type": "application/json", "Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}"}
+    headers = {"Content-Type": "application/json", "Authorization": f"Bearer {OPENAI_API_KEY}"}
     payload = {"model": model.value, "messages": messages, "max_tokens": max_tokens}
-
 
     # Sending the completion request:
     print(f"\033[1;32mSent completion request.\033[0m")
