@@ -27,6 +27,7 @@ class MessageFeedback(Enum):
 
 
 class AIModel(Enum):
+    GPT_5_3 = "gpt-5.3"
     GPT_4O = "gpt-4o"
     GPT_4O_MINI = "gpt-4o-mini"
 

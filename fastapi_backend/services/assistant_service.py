@@ -154,7 +154,7 @@ def text_to_speech(text: str, voice: OpenAIVoice = OpenAIVoice.ALLOY) -> str:
     return encoded_audio
 
 
-def send_completion_request(_: user_dependency, messages: dict, encoded_image: str = None, model: AIModel = AIModel.GPT_4O, max_tokens: int = 300) -> str:
+def send_completion_request(_: user_dependency, messages: dict, encoded_image: str = None, model: AIModel = AIModel.GPT_5_3, max_tokens: int = 300) -> str:
 
     if encoded_image: 
         # If there is an image, adding it to the user's last message (all past images excluded due to context window limits):
@@ -187,7 +187,7 @@ def send_completion_request(_: user_dependency, messages: dict, encoded_image: s
 
 
 async def completion(db: db_dependency, user: user_dependency, text: Optional[str], audio: Optional[UploadFile], 
-                     image: Optional[UploadFile], encoded_image: Optional[str] = None, model: AIModel = AIModel.GPT_4O, 
+                     image: Optional[UploadFile], encoded_image: Optional[str] = None, model: AIModel = AIModel.GPT_5_3, 
                      generate_audio: bool = False, tts_model: TTSModel = TTSModel.OPENAI, openai_voice: OpenAIVoice = OpenAIVoice.ALLOY, 
                      max_tokens: int = 300, context_message_count: int = 20) -> dict:
 
