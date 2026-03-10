@@ -154,7 +154,7 @@ def text_to_speech(text: str, voice: OpenAIVoice = OpenAIVoice.ALLOY) -> str:
     return encoded_audio
 
 
-def send_completion_request(_: user_dependency, messages: dict, encoded_image: str = None, model: AIModel = AIModel.GPT_5_3, max_tokens: int = 300) -> str:
+def send_completion_request(_: user_dependency, messages: dict, encoded_image: str = None, model: AIModel = AIModel.GPT_5_1, max_tokens: int = 300) -> str:
 
     if encoded_image: 
         # If there is an image, adding it to the user's last message (all past images excluded due to context window limits):
@@ -162,7 +162,12 @@ def send_completion_request(_: user_dependency, messages: dict, encoded_image: s
         messages[-1]["content"].append({"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{encoded_image}"}})
         
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {OPENAI_API_KEY}"}
-    payload = {"model": model.value, "messages": messages, "max_tokens": max_tokens}
+    payload = {"model": model.value, "messages": messages}
+    # GPT-5 models require max_completion_tokens; older models still use max_tokens.
+    if model.value.startswith("gpt-5"):
+        payload["max_completion_tokens"] = max_tokens
+    else:
+        payload["max_tokens"] = max_tokens
 
     # Sending the completion request:
     print(f"\033[1;32mSent completion request.\033[0m")
@@ -187,7 +192,7 @@ def send_completion_request(_: user_dependency, messages: dict, encoded_image: s
 
 
 async def completion(db: db_dependency, user: user_dependency, text: Optional[str], audio: Optional[UploadFile], 
-                     image: Optional[UploadFile], encoded_image: Optional[str] = None, model: AIModel = AIModel.GPT_5_3, 
+                     image: Optional[UploadFile], encoded_image: Optional[str] = None, model: AIModel = AIModel.GPT_5_1, 
                      generate_audio: bool = False, tts_model: TTSModel = TTSModel.OPENAI, openai_voice: OpenAIVoice = OpenAIVoice.ALLOY, 
                      max_tokens: int = 300, context_message_count: int = 20) -> dict:
 

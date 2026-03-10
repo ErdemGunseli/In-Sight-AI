@@ -17,7 +17,7 @@ router = APIRouter(prefix="/assistant", tags=["Assistant"])
 async def completion(db: db_dependency, user: user_dependency, request: Request,
                      text: Optional[str] = Form(None), audio: UploadFile = File(None), 
                      image: UploadFile = File(None), encoded_image: Optional[str] = Form(None),
-                     model: AIModel = Form(AIModel.GPT_5_3), generate_audio: bool = Form(False),
+                     model: AIModel = Form(AIModel.GPT_5_1), generate_audio: bool = Form(False),
                      tts_model: TTSModel = Form(TTSModel.OPENAI), openai_voice: OpenAIVoice = Form(OpenAIVoice.ALLOY)):
 
     return await assistant_service.completion(db, user, text, audio, image, encoded_image, model, generate_audio, tts_model, openai_voice)

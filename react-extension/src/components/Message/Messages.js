@@ -24,7 +24,8 @@ function Messages() {
 
     const hasMessages = messages.some(
         (message) =>
-            (message.text && message.text.trim()) || message.encoded_image
+            message &&
+            ((message.text && message.text.trim()) || message.encoded_image)
     );
 
     return (
@@ -45,8 +46,10 @@ function Messages() {
                     {messages
                         .filter(
                             (message) =>
-                                (message.text && message.text.trim()) ||
+                            message &&
+                            ((message.text && message.text.trim()) ||
                                 message.encoded_image
+                            )
                         )
                         .map((message, index) => (
                             <ListItem key={index}>

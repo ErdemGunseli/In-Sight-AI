@@ -54,6 +54,10 @@ function MessageInput() {
       const compressedImageData = await resizeBase64Image(encodedImage);
       const assistantMessage = await completion(textInput, compressedImageData, !isMuted);
 
+      if (!assistantMessage) {
+        return;
+      }
+
       addMessage(assistantMessage);
 
       if (assistantMessage.encoded_audio && !isMuted) {

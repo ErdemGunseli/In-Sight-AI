@@ -15,7 +15,7 @@ function VersionText() {
         color: 'grey.500' 
       }}
     >
-      in-sight.ai · version 1.0.0
+      in-sight.ai · version 2.0
     </Typography>
   );
 }

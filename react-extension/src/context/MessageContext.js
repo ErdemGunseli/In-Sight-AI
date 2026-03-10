@@ -27,6 +27,10 @@ export const MessageProvider = ({ children }) => {
   };
 
   const addMessage = (message) => {
+    if (!message || typeof message !== 'object') {
+      return;
+    }
+
     setMessages((prevMessages) => [...prevMessages, message]);
   };
 
