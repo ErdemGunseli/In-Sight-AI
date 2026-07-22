@@ -1,5 +1,5 @@
 {
-    "BASE_URL": "https://backend-gateway-zyu0.onrender.com/in-sight",
+    "BASE_URL": "https://insight.api.erdemgunseli.com",
     "BASE_URL2": "http://localhost:8000"
 
 }
