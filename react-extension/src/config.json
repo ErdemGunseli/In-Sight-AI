@@ -1,5 +1,5 @@
 {
-    "BASE_URL": "https://insight.api.erdemgunseli.com",
+    "BASE_URL": "https://api.insight.erdemgunseli.com",
     "BASE_URL2": "http://localhost:8000"
 
 }
